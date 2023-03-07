@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ThemeDay" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@android:color/darker_gray</item>
+        <item name="colorPrimaryDark">@android:color/darker_gray</item>
+        <item name="colorAccent">@android:color/darker_gray</item>
+        <!--        <item name="materialAlertDialogTheme">@style/AlertDialogWithFonts</item>-->
+        <!--        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">@color/colorCardBackground-->
+        <!--        </item>-->
+    </style>
+
+</resources>
