@@ -16,12 +16,14 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
-import com.example.mineskineditorlibgdx.utils.DebugLevel
-import com.example.mineskineditorlibgdx.utils.RaycastGeometry
-import com.example.mineskineditorlibgdx.utils.setFirstMaterialTexture
+import com.example.mineskineditorlibgdx.model.ModelTriangle
+import com.example.mineskineditorlibgdx.utils.*
 
 class SkinEditorGame(
-    private val debugLevel: DebugLevel = DebugLevel.LIGHT
+    private val debugLevel: DebugLevel = DebugLevel.LIGHT,
+    private val modelFilename: String = "character_custom.g3db",
+    private val modelTextureFilename: String = "texture_steve.png",
+    private val backgroundTextureFilename: String = "background.png"
 ) : Game() {
 
     private var environment: Environment? = null
@@ -50,6 +52,8 @@ class SkinEditorGame(
         // Bottom
         DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 1f, 0f)
     )
+
+    private var modelTriangles: List<ModelTriangle>? = null
 
     override fun create() {
         assets = AssetManager()
@@ -83,18 +87,19 @@ class SkinEditorGame(
             genMipMaps = false
         }
 
-        assets?.load("character_custom.g3db", Model::class.java)
-        assets?.load("texture_steve.png", Texture::class.java, parameter)
-        assets?.load("bg_main.png", Texture::class.java)
+        assets?.load(modelFilename, Model::class.java)
+        assets?.load(modelTextureFilename, Texture::class.java, parameter)
+        assets?.load(backgroundTextureFilename, Texture::class.java)
     }
 
     private fun finishResourcesLoading() {
-        val characterModel = assets!!.get("character_custom.g3db", Model::class.java)
-        val modelTexture = assets!!.get("texture_steve.png", Texture::class.java)
-        backgroundTexture = assets!!.get("bg_main.png", Texture::class.java)
+        val characterModel = assets!!.get(modelFilename, Model::class.java)
+        val modelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
+        backgroundTexture = assets!!.get(backgroundTextureFilename, Texture::class.java)
 
         instance = ModelInstance(characterModel)
-        instance?.setFirstMaterialTexture(modelTexture)
+        instance!!.setFirstMaterialTexture(modelTexture)
+        modelTriangles = instance!!.triangles()
 
         areResourcesLoading = false
     }
@@ -109,20 +114,16 @@ class SkinEditorGame(
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
         backgroundTexture?.let { texture ->
-            backgroundSpriteBatch?.begin()
-            backgroundSpriteBatch?.draw(
+            backgroundSpriteBatch?.safeDraw(
                 texture,
                 0f,
                 0f,
                 Gdx.graphics.width.toFloat(),
                 Gdx.graphics.height.toFloat()
             )
-            backgroundSpriteBatch?.end()
         }
 
-        modelBatch?.begin(cam)
-        instance?.let { modelBatch?.render(it, environment) }
-        modelBatch?.end()
+        instance?.let { modelBatch?.safeRender(cam!!, it, environment!!) }
 
         if (Gdx.input.justTouched()) {
             val ray = cam!!.getPickRay(
@@ -136,91 +137,38 @@ class SkinEditorGame(
             rayFromWorld.set(ray.origin.sub(0f, .01f, 0f))
             rayToWorld.set(ray.direction).scl(100f).add(rayFromWorld)
 
-            // DEBUG
-            var meshesIteratedThroughCount = 0
-            var intersectionsFoundCount = 0
-
-            instance!!.model.meshes.forEach { mesh ->
-                // DEBUG
-                meshesIteratedThroughCount++
-
-                val vertexSize = mesh.vertexSize / 4
-                val vertices = FloatArray(mesh.numVertices * vertexSize)
-                mesh.getVertices(vertices)
-                val indices = ShortArray(mesh.numIndices)
-                mesh.getIndices(indices)
-
-                val triangles =
-                    RaycastGeometry.getModelTriangles(indices, vertices, mesh)
-
-                val intersectionTriangles = triangles.filter {
-                    RaycastGeometry.intersectRayTriangle(
-                        ray,
-                        it.v1,
-                        it.v2,
-                        it.v3,
-                        null
-                    )
-                }
-                val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
-                    cam!!.position.dst(RaycastGeometry.getTriangleCentroid(it))
-                }
-
-                if (nearestIntersectedTriangle != null) {
-                    // DEBUG
-                    intersectionsFoundCount++
-                    Gdx.app.log(
-                        "vitalik",
-                        "Intersection found!"
-                    )
-
-                    val intersectionPoint = Vector3()
-                    RaycastGeometry.intersectRayTriangle(
-                        ray,
-                        nearestIntersectedTriangle.v1,
-                        nearestIntersectedTriangle.v2,
-                        nearestIntersectedTriangle.v3,
-                        intersectionPoint
-                    )
-
-                    // DEBUG
-                    Gdx.app.log(
-                        "vitalik",
-                        "Intersection triangles count: ${intersectionTriangles.size}"
-                    )
-                    Gdx.app.log(
-                        "vitalik",
-                        "Nearest intersected triangle: $nearestIntersectedTriangle"
-                    )
-                    Gdx.app.log(
-                        "vitalik",
-                        "Intersection point: $intersectionPoint"
-                    )
-                    val instanceTextureAttribute =
-                        instance!!.materials.first()
-                            .get(TextureAttribute.Diffuse) as TextureAttribute
-                    val texture = instanceTextureAttribute.textureDescription.texture
-                    val uv = RaycastGeometry.getIntersectionUV(
-                        intersectionPoint,
-                        nearestIntersectedTriangle
-                    )
-                    val textureX = (uv.x * texture.width).toInt()
-                    val textureY = (uv.y * texture.height).toInt()
-
-                    // DEBUG
-                    Gdx.app.log("vitalik", "Texture coords: x: $textureX, y: $textureY")
-
-                    if (!texture.textureData.isPrepared) texture.textureData.prepare()
-                    val pixmap = texture.textureData.consumePixmap()
-                    pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColor))
-                    val newTexture = Texture(pixmap)
-                    instance?.setFirstMaterialTexture(newTexture)
-                }
+            val intersectionTriangles = modelTriangles!!.filter {
+                RaycastGeometry.intersectRayTriangle(ray, it, null)
+            }
+            val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
+                cam!!.position.dst(it.centroid())
             }
 
-            // DEBUG
-            Gdx.app.log("vitalik", "Meshes iterated through: $meshesIteratedThroughCount")
-            Gdx.app.log("vitalik", "Intersections found count: $intersectionsFoundCount")
+            if (nearestIntersectedTriangle != null) {
+
+                val intersectionPoint = Vector3()
+                RaycastGeometry.intersectRayTriangle(
+                    ray,
+                    nearestIntersectedTriangle,
+                    intersectionPoint
+                )
+                val instanceTextureAttribute =
+                    instance!!.materials.first()
+                        .get(TextureAttribute.Diffuse) as TextureAttribute
+                val texture = instanceTextureAttribute.textureDescription.texture
+                val uv = RaycastGeometry.getIntersectionUV(
+                    intersectionPoint,
+                    nearestIntersectedTriangle
+                )
+                val textureX = (uv.x * texture.width).toInt()
+                val textureY = (uv.y * texture.height).toInt()
+
+                if (!texture.textureData.isPrepared) texture.textureData.prepare()
+                val pixmap = texture.textureData.consumePixmap()
+                pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColor))
+                val newTexture = Texture(pixmap)
+                instance?.setFirstMaterialTexture(newTexture)
+            }
         }
     }
 
@@ -230,21 +178,4 @@ class SkinEditorGame(
         backgroundSpriteBatch?.dispose()
         assets?.dispose()
     }
-}
-
-private fun drawVertices(
-    vertices: FloatArray,
-    vertexSize: Int,
-    shapeRenderer: ShapeRenderer,
-    color: Color
-) {
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-    shapeRenderer.color = color
-    for (i in vertices.indices step vertexSize) {
-        val x = vertices[i]
-        val y = vertices[i + 1]
-        val z = vertices[i + 2]
-        shapeRenderer.box(x, y, z, .4f, .4f, .4f)
-    }
-    shapeRenderer.end()
 }
