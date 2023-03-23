@@ -21,9 +21,11 @@ import com.example.mineskineditorlibgdx.utils.*
 
 class SkinEditorGame(
     private val debugLevel: DebugLevel = DebugLevel.LIGHT,
+    private val debugColorPrimary: Color = Color.RED,
+    private val debugColorSecondary: Color = Color.BLUE,
     private val modelFilename: String = "character_custom.g3db",
     private val modelTextureFilename: String = "texture_steve.png",
-    private val backgroundTextureFilename: String = "background.png"
+    private val backgroundTextureFilename: String = "bg_main.png"
 ) : Game() {
 
     private var environment: Environment? = null
@@ -34,13 +36,14 @@ class SkinEditorGame(
     private var instance: ModelInstance? = null
     private var assets: AssetManager? = null
     private var backgroundTexture: Texture? = null
-    private val debugColor = Color.RED
     private var areResourcesLoading: Boolean = true
 
-    private lateinit var textureDebugSpriteBatch: SpriteBatch
-    private lateinit var shapeDebugRenderer: ShapeRenderer
-    private val rayFromWorld = Vector3()
-    private val rayToWorld = Vector3()
+    private val logTag = this::class.simpleName
+    private var debugTextureSpriteBatch: SpriteBatch? = null
+    private var debugShapeRenderer: ShapeRenderer? = null
+    private val debugRayStartPoint = Vector3()
+    private val debugRayEndPoint = Vector3()
+    private var debugLastIntersectedTriangle: ModelTriangle? = null
 
     private val surroundingLights = arrayOf(
         // Left and right
@@ -56,10 +59,12 @@ class SkinEditorGame(
     private var modelTriangles: List<ModelTriangle>? = null
 
     override fun create() {
+        if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() called")
+
         assets = AssetManager()
         modelBatch = ModelBatch()
-        textureDebugSpriteBatch = SpriteBatch()
-        shapeDebugRenderer = ShapeRenderer()
+        debugTextureSpriteBatch = SpriteBatch()
+        debugShapeRenderer = ShapeRenderer()
         backgroundSpriteBatch = SpriteBatch()
         environment = Environment()
         environment?.set(ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
@@ -90,9 +95,13 @@ class SkinEditorGame(
         assets?.load(modelFilename, Model::class.java)
         assets?.load(modelTextureFilename, Texture::class.java, parameter)
         assets?.load(backgroundTextureFilename, Texture::class.java)
+
+        if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() finished")
     }
 
     private fun finishResourcesLoading() {
+        if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "finishResourcesLoading() called")
+
         val characterModel = assets!!.get(modelFilename, Model::class.java)
         val modelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
         backgroundTexture = assets!!.get(backgroundTextureFilename, Texture::class.java)
@@ -102,6 +111,8 @@ class SkinEditorGame(
         modelTriangles = instance!!.triangles()
 
         areResourcesLoading = false
+
+        if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "finishResourcesLoading() finished")
     }
 
 
@@ -125,7 +136,29 @@ class SkinEditorGame(
 
         instance?.let { modelBatch?.safeRender(cam!!, it, environment!!) }
 
+        if (debugLevel > DebugLevel.LIGHT) {
+            modelTriangles?.let { triangles ->
+                debugShapeRenderer?.safeDrawModelTriangles(cam!!, triangles, debugColorPrimary)
+            }
+            debugLastIntersectedTriangle?.let { lastTriangle ->
+                debugShapeRenderer?.safeDrawModelTriangle(
+                    cam!!,
+                    lastTriangle,
+                    debugColorSecondary
+                )
+            }
+            debugShapeRenderer?.safeDrawLine(
+                cam = cam!!,
+                startVector = debugRayStartPoint,
+                endVector = debugRayEndPoint,
+                color = debugColorSecondary,
+                lineWidth = 4f
+            )
+        }
+
         if (Gdx.input.justTouched()) {
+            if (debugLevel > DebugLevel.NONE) Gdx.app.log(logTag, "Scene touched!")
+
             val ray = cam!!.getPickRay(
                 Gdx.input.x.toFloat(),
                 Gdx.input.y.toFloat(),
@@ -134,8 +167,11 @@ class SkinEditorGame(
                 Gdx.graphics.width.toFloat(),
                 Gdx.graphics.height.toFloat()
             )
-            rayFromWorld.set(ray.origin.sub(0f, .01f, 0f))
-            rayToWorld.set(ray.direction).scl(100f).add(rayFromWorld)
+
+            if (debugLevel > DebugLevel.LIGHT) {
+                debugRayStartPoint.set(ray.origin.sub(0f, .01f, 0f))
+                debugRayEndPoint.set(ray.direction).scl(100f).add(debugRayStartPoint)
+            }
 
             val intersectionTriangles = modelTriangles!!.filter {
                 RaycastGeometry.intersectRayTriangle(ray, it, null)
@@ -145,6 +181,9 @@ class SkinEditorGame(
             }
 
             if (nearestIntersectedTriangle != null) {
+                if (debugLevel > DebugLevel.LIGHT) {
+                    debugLastIntersectedTriangle = nearestIntersectedTriangle
+                }
 
                 val intersectionPoint = Vector3()
                 RaycastGeometry.intersectRayTriangle(
@@ -163,17 +202,35 @@ class SkinEditorGame(
                 val textureX = (uv.x * texture.width).toInt()
                 val textureY = (uv.y * texture.height).toInt()
 
+                if (debugLevel > DebugLevel.LIGHT) {
+                    Gdx.app.log(
+                        logTag,
+                        "Intersection point: $intersectionPoint, UV: $uv, Texture: $textureX, $textureY"
+                    )
+                    Gdx.app.log(
+                        logTag,
+                        "UV: x: ${uv.x}, y: ${uv.y}"
+                    )
+                }
+                if (debugLevel > DebugLevel.NONE) {
+                    Gdx.app.log(
+                        logTag,
+                        "Texture: x: $textureX, y: $textureY"
+                    )
+                }
+
                 if (!texture.textureData.isPrepared) texture.textureData.prepare()
                 val pixmap = texture.textureData.consumePixmap()
-                pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColor))
+                pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColorPrimary))
                 val newTexture = Texture(pixmap)
                 instance?.setFirstMaterialTexture(newTexture)
             }
         }
     }
 
-
     override fun dispose() {
+        debugShapeRenderer?.dispose()
+        debugTextureSpriteBatch?.dispose()
         modelBatch?.dispose()
         backgroundSpriteBatch?.dispose()
         assets?.dispose()

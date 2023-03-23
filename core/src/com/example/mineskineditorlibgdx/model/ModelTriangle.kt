@@ -54,4 +54,6 @@ data class ModelTriangle(
         tmpV0.crs(tmpV2.set(v2).sub(point))
         return tmpV1.dot(tmpV0) >= 0f
     }
+
+    override fun toString() = "${this.javaClass.simpleName}($v1, $v2, $v3)"
 }

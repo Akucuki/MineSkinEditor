@@ -1,6 +1,8 @@
 package com.example.mineskineditorlibgdx.utils
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -9,11 +11,51 @@ import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.RenderableProvider
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
 private const val BYTES_IN_FLOAT = 4
+
+fun ShapeRenderer.safeDrawLine(
+    cam: Camera,
+    startVector: Vector3,
+    endVector: Vector3,
+    color: Color,
+    lineWidth: Float = 2f
+) {
+    Gdx.gl.glLineWidth(lineWidth)
+    projectionMatrix = cam.combined
+    begin(ShapeRenderer.ShapeType.Line)
+    this.color = color
+    line(startVector, endVector)
+    end()
+}
+fun ShapeRenderer.safeDrawModelTriangles(
+    cam: Camera,
+    triangles: List<ModelTriangle>,
+    color: Color,
+    lineWidth: Float = 2f
+) {
+    triangles.forEach { triangle -> safeDrawModelTriangle(cam, triangle, color, lineWidth) }
+}
+
+fun ShapeRenderer.safeDrawModelTriangle(
+    cam: Camera,
+    triangle: ModelTriangle,
+    color: Color,
+    lineWidth: Float = 2f
+) {
+    Gdx.gl.glLineWidth(lineWidth)
+    projectionMatrix = cam.combined
+    begin(ShapeRenderer.ShapeType.Line)
+    this.color = color
+    line(triangle.v1, triangle.v2)
+    line(triangle.v2, triangle.v3)
+    line(triangle.v3, triangle.v1)
+    end()
+}
 
 fun ModelBatch.safeRender(
     cam: Camera,
