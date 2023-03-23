@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.example.mineskineditorlibgdx.SkinEditorGame
+import com.example.mineskineditorlibgdx.features.libgdx.core.ModelViewerGame
 
 class LibgdxFragment : AndroidFragmentApplication() {
 
@@ -14,6 +14,6 @@ class LibgdxFragment : AndroidFragmentApplication() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return initializeForView(SkinEditorGame())
+        return initializeForView(ModelViewerGame())
     }
 }

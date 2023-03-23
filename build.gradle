@@ -52,7 +52,6 @@ project(":android") {
     configurations { natives }
 
     dependencies {
-        implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
@@ -64,14 +63,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-x86_64"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    }
-}
 
-project(":core") {
-    apply plugin: "kotlin"
-
-
-    dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"

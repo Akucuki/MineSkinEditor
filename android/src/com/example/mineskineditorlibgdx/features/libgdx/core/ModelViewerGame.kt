@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx
+package com.example.mineskineditorlibgdx.features.libgdx.core
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
@@ -16,10 +16,10 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
+import com.example.mineskineditorlibgdx.features.libgdx.core.utils.*
 import com.example.mineskineditorlibgdx.model.ModelTriangle
-import com.example.mineskineditorlibgdx.utils.*
 
-class SkinEditorGame(
+class ModelViewerGame(
     private val debugLevel: DebugLevel = DebugLevel.LIGHT,
     private val debugColorPrimary: Color = Color.RED,
     private val debugColorSecondary: Color = Color.BLUE,
