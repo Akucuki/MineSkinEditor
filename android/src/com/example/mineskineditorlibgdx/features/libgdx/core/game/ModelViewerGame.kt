@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.core.games
+package com.example.mineskineditorlibgdx.features.libgdx.core.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.ScreenUtils
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.brush.*
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.*
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
@@ -25,8 +26,7 @@ class ModelViewerGame(
     private val debugColorPrimary: Color = Color.RED,
     private val debugColorSecondary: Color = Color.BLUE,
     private val modelFilename: String = "character_custom.g3db",
-    private val modelTextureFilename: String = "texture_steve.png",
-//    private val backgroundTextureFilename: String = "bg_main.png"
+    private val modelTextureFilename: String = "texture_steve.png"
 ) : Game() {
 
     private var environment: Environment? = null
@@ -36,7 +36,6 @@ class ModelViewerGame(
     private var modelBatch: ModelBatch? = null
     private var instance: ModelInstance? = null
     private var assets: AssetManager? = null
-//    private var backgroundTexture: Texture? = null
     private var areResourcesLoading: Boolean = true
 
     private val logTag = this::class.simpleName
@@ -58,6 +57,8 @@ class ModelViewerGame(
     )
 
     private var modelTriangles: List<ModelTriangle>? = null
+
+    var paintBrush: PaintBrush = Noise(thickness = 3, .9f)
 
     override fun create() {
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() called")
@@ -95,7 +96,6 @@ class ModelViewerGame(
 
         assets?.load(modelFilename, Model::class.java)
         assets?.load(modelTextureFilename, Texture::class.java, parameter)
-//        assets?.load(backgroundTextureFilename, Texture::class.java)
 
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() finished")
     }
@@ -105,7 +105,6 @@ class ModelViewerGame(
 
         val characterModel = assets!!.get(modelFilename, Model::class.java)
         val modelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
-//        backgroundTexture = assets!!.get(backgroundTextureFilename, Texture::class.java)
 
         instance = ModelInstance(characterModel)
         instance!!.setFirstMaterialTexture(modelTexture)
@@ -125,16 +124,6 @@ class ModelViewerGame(
 
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
-
-//        backgroundTexture?.let { texture ->
-//            backgroundSpriteBatch?.safeDraw(
-//                texture,
-//                0f,
-//                0f,
-//                Gdx.graphics.width.toFloat(),
-//                Gdx.graphics.height.toFloat()
-//            )
-//        }
 
         instance?.let { modelBatch?.safeRender(cam!!, it, environment!!) }
 
@@ -223,7 +212,7 @@ class ModelViewerGame(
 
                 if (!texture.textureData.isPrepared) texture.textureData.prepare()
                 val pixmap = texture.textureData.consumePixmap()
-                pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColorPrimary))
+                paintBrush.paint(textureX, textureY, debugColorPrimary, pixmap)
                 val newTexture = Texture(pixmap)
                 instance?.setFirstMaterialTexture(newTexture)
             }
@@ -234,7 +223,6 @@ class ModelViewerGame(
         debugShapeRenderer?.dispose()
         debugTextureSpriteBatch?.dispose()
         modelBatch?.dispose()
-//        backgroundSpriteBatch?.dispose()
         assets?.dispose()
     }
 }
