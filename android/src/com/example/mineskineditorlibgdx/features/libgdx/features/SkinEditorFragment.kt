@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.viewinterop.AndroidView
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.example.mineskineditorlibgdx.features.libgdx.core.games.ModelViewerGame
+import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 
 class SkinEditorFragment : AndroidFragmentApplication() {
 

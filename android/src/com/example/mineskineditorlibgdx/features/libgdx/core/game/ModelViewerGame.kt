@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.core.games
+package com.example.mineskineditorlibgdx.features.libgdx.core.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.ScreenUtils
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.brush.*
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.*
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
@@ -56,6 +57,8 @@ class ModelViewerGame(
     )
 
     private var modelTriangles: List<ModelTriangle>? = null
+
+    var paintBrush: PaintBrush = Noise(thickness = 3, .9f)
 
     override fun create() {
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() called")
@@ -209,7 +212,7 @@ class ModelViewerGame(
 
                 if (!texture.textureData.isPrepared) texture.textureData.prepare()
                 val pixmap = texture.textureData.consumePixmap()
-                pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColorPrimary))
+                paintBrush.paint(textureX, textureY, debugColorPrimary, pixmap)
                 val newTexture = Texture(pixmap)
                 instance?.setFirstMaterialTexture(newTexture)
             }
