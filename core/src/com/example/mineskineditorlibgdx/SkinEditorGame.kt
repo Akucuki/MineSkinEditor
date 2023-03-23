@@ -16,9 +16,13 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
+import com.example.mineskineditorlibgdx.utils.DebugLevel
 import com.example.mineskineditorlibgdx.utils.RaycastGeometry
+import com.example.mineskineditorlibgdx.utils.setFirstMaterialTexture
 
-class SkinEditorGame : Game() {
+class SkinEditorGame(
+    private val debugLevel: DebugLevel = DebugLevel.LIGHT
+) : Game() {
 
     private var environment: Environment? = null
     private var cam: Camera? = null
@@ -36,6 +40,17 @@ class SkinEditorGame : Game() {
     private val rayFromWorld = Vector3()
     private val rayToWorld = Vector3()
 
+    private val surroundingLights = arrayOf(
+        // Left and right
+        DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f),
+        DirectionalLight().set(0.8f, 0.8f, 0.8f, 1f, -0.8f, 0.2f),
+        // Facing and back
+        DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, -0.8f, -1f),
+        DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, -0.8f, 1f),
+        // Bottom
+        DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 1f, 0f)
+    )
+
     override fun create() {
         assets = AssetManager()
         modelBatch = ModelBatch()
@@ -44,31 +59,29 @@ class SkinEditorGame : Game() {
         backgroundSpriteBatch = SpriteBatch()
         environment = Environment()
         environment?.set(ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
-        // Left and right
-        environment?.add(DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f))
-        environment?.add(DirectionalLight().set(0.8f, 0.8f, 0.8f, 1f, -0.8f, 0.2f))
 
-        // Facing and back
-        environment?.add(DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, -0.8f, -1f))
-        environment?.add(DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, -0.8f, 1f))
+        surroundingLights.forEach { environment?.add(it) }
 
-        // Bottom
-        environment?.add(DirectionalLight().set(0.8f, 0.8f, 0.8f, 0f, 1f, 0f))
-
-        cam = PerspectiveCamera(80f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-        cam?.position?.set(5f, 15f, 30f)
-        cam?.lookAt(0f, 15f, 0f)
-        cam?.near = 0.1f
-        cam?.far = 100f
-        cam?.update()
+        cam = PerspectiveCamera(
+            80f,
+            Gdx.graphics.width.toFloat(),
+            Gdx.graphics.height.toFloat()
+        ).apply {
+            position?.set(5f, 15f, 30f)
+            lookAt(0f, 15f, 0f)
+            near = 0.1f
+            far = 100f
+            update()
+        }
 
         camController = CameraInputController(cam)
         Gdx.input.inputProcessor = camController
 
-        val parameter = TextureLoader.TextureParameter()
-        parameter.minFilter = Texture.TextureFilter.Nearest
-        parameter.magFilter = Texture.TextureFilter.Nearest
-        parameter.genMipMaps = false
+        val parameter = TextureLoader.TextureParameter().apply {
+            minFilter = Texture.TextureFilter.Nearest
+            magFilter = Texture.TextureFilter.Nearest
+            genMipMaps = false
+        }
 
         assets?.load("character_custom.g3db", Model::class.java)
         assets?.load("texture_steve.png", Texture::class.java, parameter)
@@ -81,7 +94,7 @@ class SkinEditorGame : Game() {
         backgroundTexture = assets!!.get("bg_main.png", Texture::class.java)
 
         instance = ModelInstance(characterModel)
-        instance?.materials?.first()?.set(TextureAttribute.createDiffuse(modelTexture))
+        instance?.setFirstMaterialTexture(modelTexture)
 
         areResourcesLoading = false
     }
@@ -124,91 +137,88 @@ class SkinEditorGame : Game() {
             rayToWorld.set(ray.direction).scl(100f).add(rayFromWorld)
 
             // DEBUG
-            var meshPartsIteratedThroughCount = 0
             var meshesIteratedThroughCount = 0
             var intersectionsFoundCount = 0
 
-            instance!!.model.meshParts.forEach { meshPart ->
+            instance!!.model.meshes.forEach { mesh ->
                 // DEBUG
-                meshPartsIteratedThroughCount++
+                meshesIteratedThroughCount++
 
-                meshPart.mesh.let { mesh ->
+                val vertexSize = mesh.vertexSize / 4
+                val vertices = FloatArray(mesh.numVertices * vertexSize)
+                mesh.getVertices(vertices)
+                val indices = ShortArray(mesh.numIndices)
+                mesh.getIndices(indices)
+
+                val triangles =
+                    RaycastGeometry.getModelTriangles(indices, vertices, mesh)
+
+                val intersectionTriangles = triangles.filter {
+                    RaycastGeometry.intersectRayTriangle(
+                        ray,
+                        it.v1,
+                        it.v2,
+                        it.v3,
+                        null
+                    )
+                }
+                val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
+                    cam!!.position.dst(RaycastGeometry.getTriangleCentroid(it))
+                }
+
+                if (nearestIntersectedTriangle != null) {
                     // DEBUG
-                    meshesIteratedThroughCount++
+                    intersectionsFoundCount++
+                    Gdx.app.log(
+                        "vitalik",
+                        "Intersection found!"
+                    )
 
-                    val vertexSize = mesh.vertexSize / 4
-                    val vertices = FloatArray(mesh.numVertices * vertexSize)
-                    mesh.getVertices(vertices)
-                    val indices = ShortArray(mesh.numIndices)
-                    mesh.getIndices(indices)
+                    val intersectionPoint = Vector3()
+                    RaycastGeometry.intersectRayTriangle(
+                        ray,
+                        nearestIntersectedTriangle.v1,
+                        nearestIntersectedTriangle.v2,
+                        nearestIntersectedTriangle.v3,
+                        intersectionPoint
+                    )
 
-                    val triangles = RaycastGeometry.getModelTriangles(indices, meshPart, vertices, mesh)
+                    // DEBUG
+                    Gdx.app.log(
+                        "vitalik",
+                        "Intersection triangles count: ${intersectionTriangles.size}"
+                    )
+                    Gdx.app.log(
+                        "vitalik",
+                        "Nearest intersected triangle: $nearestIntersectedTriangle"
+                    )
+                    Gdx.app.log(
+                        "vitalik",
+                        "Intersection point: $intersectionPoint"
+                    )
+                    val instanceTextureAttribute =
+                        instance!!.materials.first()
+                            .get(TextureAttribute.Diffuse) as TextureAttribute
+                    val texture = instanceTextureAttribute.textureDescription.texture
+                    val uv = RaycastGeometry.getIntersectionUV(
+                        intersectionPoint,
+                        nearestIntersectedTriangle
+                    )
+                    val textureX = (uv.x * texture.width).toInt()
+                    val textureY = (uv.y * texture.height).toInt()
 
-                    val intersectionTriangles = triangles.filter {
-                        RaycastGeometry.intersectRayTriangle(
-                            ray,
-                            it.v1,
-                            it.v2,
-                            it.v3,
-                            null
-                        )
-                    }
-                    val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
-                        cam!!.position.dst(RaycastGeometry.getTriangleCentroid(it))
-                    }
+                    // DEBUG
+                    Gdx.app.log("vitalik", "Texture coords: x: $textureX, y: $textureY")
 
-                    if (nearestIntersectedTriangle != null) {
-                        // DEBUG
-                        intersectionsFoundCount++
-                        Gdx.app.log(
-                            "vitalik",
-                            "Intersection found!"
-                        )
-
-                        val intersectionPoint = Vector3()
-                        RaycastGeometry.intersectRayTriangle(
-                            ray,
-                            nearestIntersectedTriangle.v1,
-                            nearestIntersectedTriangle.v2,
-                            nearestIntersectedTriangle.v3,
-                            intersectionPoint
-                        )
-
-                        // DEBUG
-                        Gdx.app.log(
-                            "vitalik",
-                            "Intersection triangles count: ${intersectionTriangles.size}"
-                        )
-                        Gdx.app.log(
-                            "vitalik",
-                            "Nearest intersected triangle: $nearestIntersectedTriangle"
-                        )
-                        Gdx.app.log(
-                            "vitalik",
-                            "Intersection point: $intersectionPoint"
-                        )
-                        val instanceTextureAttribute =
-                            instance!!.materials.first()
-                                .get(TextureAttribute.Diffuse) as TextureAttribute
-                        val texture = instanceTextureAttribute.textureDescription.texture
-                        val uv = RaycastGeometry.getIntersectionUV(intersectionPoint, nearestIntersectedTriangle)
-                        val textureX = (uv.x * texture.width).toInt()
-                        val textureY = (uv.y * texture.height).toInt()
-
-                        // DEBUG
-                        Gdx.app.log("vitalik", "Texture coords: x: $textureX, y: $textureY")
-
-                        if (!texture.textureData.isPrepared) texture.textureData.prepare()
-                        val pixmap = texture.textureData.consumePixmap()
-                        pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColor))
-                        val newTexture = Texture(pixmap)
-                        instance!!.materials.first().set(TextureAttribute.createDiffuse(newTexture))
-                    }
+                    if (!texture.textureData.isPrepared) texture.textureData.prepare()
+                    val pixmap = texture.textureData.consumePixmap()
+                    pixmap.drawPixel(textureX, textureY, Color.rgba8888(debugColor))
+                    val newTexture = Texture(pixmap)
+                    instance?.setFirstMaterialTexture(newTexture)
                 }
             }
 
             // DEBUG
-            Gdx.app.log("vitalik", "MeshParts iterated through: $meshPartsIteratedThroughCount")
             Gdx.app.log("vitalik", "Meshes iterated through: $meshesIteratedThroughCount")
             Gdx.app.log("vitalik", "Intersections found count: $intersectionsFoundCount")
         }

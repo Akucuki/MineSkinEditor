@@ -2,7 +2,6 @@ package com.example.mineskineditorlibgdx.utils
 
 import com.badlogic.gdx.graphics.Mesh
 import com.badlogic.gdx.graphics.VertexAttributes
-import com.badlogic.gdx.graphics.g3d.model.MeshPart
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.math.collision.Ray
 import com.example.mineskineditorlibgdx.model.ModelTriangle
@@ -19,13 +18,12 @@ object RaycastGeometry {
 
     fun getModelTriangles(
         indices: ShortArray,
-        meshPart: MeshPart,
         vertices: FloatArray,
         mesh: Mesh
     ): List<ModelTriangle> {
         val triangles = mutableListOf<ModelTriangle>()
         for (i in indices.indices step 3) {
-            val stride = meshPart.mesh.vertexSize / 4
+            val stride = mesh.vertexSize / 4
             val vertexIndex1 = indices[i].toInt() * stride
             val vertexIndex2 = indices[i + 1].toInt() * stride
             val vertexIndex3 = indices[i + 2].toInt() * stride
