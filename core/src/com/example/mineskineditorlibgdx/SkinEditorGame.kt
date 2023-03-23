@@ -160,6 +160,10 @@ class SkinEditorGame : Game() {
                     if (nearestIntersectedTriangle != null) {
                         // DEBUG
                         intersectionsFoundCount++
+                        Gdx.app.log(
+                            "vitalik",
+                            "Intersection found!"
+                        )
 
                         val intersectionPoint = Vector3()
                         RaycastGeometry.intersectRayTriangle(
