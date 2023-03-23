@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx
+package com.example.mineskineditorlibgdx.features.libgdx.core.games
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
@@ -16,16 +16,17 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.ScreenUtils
+import com.example.mineskineditorlibgdx.features.libgdx.core.utils.*
 import com.example.mineskineditorlibgdx.model.ModelTriangle
-import com.example.mineskineditorlibgdx.utils.*
 
-class SkinEditorGame(
+class ModelViewerGame(
     private val debugLevel: DebugLevel = DebugLevel.LIGHT,
     private val debugColorPrimary: Color = Color.RED,
     private val debugColorSecondary: Color = Color.BLUE,
     private val modelFilename: String = "character_custom.g3db",
     private val modelTextureFilename: String = "texture_steve.png",
-    private val backgroundTextureFilename: String = "bg_main.png"
+//    private val backgroundTextureFilename: String = "bg_main.png"
 ) : Game() {
 
     private var environment: Environment? = null
@@ -35,7 +36,7 @@ class SkinEditorGame(
     private var modelBatch: ModelBatch? = null
     private var instance: ModelInstance? = null
     private var assets: AssetManager? = null
-    private var backgroundTexture: Texture? = null
+//    private var backgroundTexture: Texture? = null
     private var areResourcesLoading: Boolean = true
 
     private val logTag = this::class.simpleName
@@ -94,7 +95,7 @@ class SkinEditorGame(
 
         assets?.load(modelFilename, Model::class.java)
         assets?.load(modelTextureFilename, Texture::class.java, parameter)
-        assets?.load(backgroundTextureFilename, Texture::class.java)
+//        assets?.load(backgroundTextureFilename, Texture::class.java)
 
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() finished")
     }
@@ -104,7 +105,7 @@ class SkinEditorGame(
 
         val characterModel = assets!!.get(modelFilename, Model::class.java)
         val modelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
-        backgroundTexture = assets!!.get(backgroundTextureFilename, Texture::class.java)
+//        backgroundTexture = assets!!.get(backgroundTextureFilename, Texture::class.java)
 
         instance = ModelInstance(characterModel)
         instance!!.setFirstMaterialTexture(modelTexture)
@@ -117,6 +118,7 @@ class SkinEditorGame(
 
 
     override fun render() {
+        ScreenUtils.clear(0f, 0f, 0f, 0f)
         if (areResourcesLoading && assets?.update() == true) finishResourcesLoading()
 
         camController?.update()
@@ -124,15 +126,15 @@ class SkinEditorGame(
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-        backgroundTexture?.let { texture ->
-            backgroundSpriteBatch?.safeDraw(
-                texture,
-                0f,
-                0f,
-                Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat()
-            )
-        }
+//        backgroundTexture?.let { texture ->
+//            backgroundSpriteBatch?.safeDraw(
+//                texture,
+//                0f,
+//                0f,
+//                Gdx.graphics.width.toFloat(),
+//                Gdx.graphics.height.toFloat()
+//            )
+//        }
 
         instance?.let { modelBatch?.safeRender(cam!!, it, environment!!) }
 
@@ -232,7 +234,7 @@ class SkinEditorGame(
         debugShapeRenderer?.dispose()
         debugTextureSpriteBatch?.dispose()
         modelBatch?.dispose()
-        backgroundSpriteBatch?.dispose()
+//        backgroundSpriteBatch?.dispose()
         assets?.dispose()
     }
 }

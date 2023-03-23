@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.utils
+package com.example.mineskineditorlibgdx.features.libgdx.core.utils
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Camera

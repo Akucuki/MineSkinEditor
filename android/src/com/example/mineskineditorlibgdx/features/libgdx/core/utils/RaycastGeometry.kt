@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.utils
+package com.example.mineskineditorlibgdx.features.libgdx.core.utils
 
 import com.badlogic.gdx.math.*
 import com.badlogic.gdx.math.collision.Ray
