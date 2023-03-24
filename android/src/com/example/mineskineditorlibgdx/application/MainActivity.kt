@@ -2,6 +2,7 @@ package com.example.mineskineditorlibgdx.application
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        applyEdgeToEdge()
         lifecycleScope.apply {
             launch {
                 withContext(Dispatchers.IO) {
@@ -62,6 +64,10 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
 
     private suspend fun observeNavigationCommands() {
         for (command in navigationDispatcher.navigationEmitter) command.invoke(navController)
+    }
+
+    private fun applyEdgeToEdge() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     override fun exit() {}

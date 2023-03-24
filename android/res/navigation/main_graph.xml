@@ -10,7 +10,7 @@
 
     <fragment
         android:id="@+id/fragmentSkinEditor"
-        android:name="com.example.mineskineditorlibgdx.features.libgdx.features.SkinEditorFragment">
+        android:name="com.example.mineskineditorlibgdx.features.libgdx.features.SkinEditor3DFragment">
     </fragment>
 
 </navigation>

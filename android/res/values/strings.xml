@@ -2,5 +2,12 @@
 <resources>
 
     <string name="app_name">MineSkinEditorLibgdx</string>
+    <string name="skin_editor">Skin Editor</string>
+    <string name="pencil">Pencil</string>
+    <string name="noise">Noise</string>
+    <string name="brush">Brush</string>
+    <string name="fill">Fill</string>
+    <string name="undo">Undo</string>
+    <string name="eraser">Eraser</string>
 
 </resources>
