@@ -32,9 +32,3 @@ enum class EditorToolType {
         }
     }
 }
-
-data class EditorToolWrapper(
-    val type: EditorToolType,
-    val isActive: Boolean = false,
-    val isInOptionsMode: Boolean = false
-)
