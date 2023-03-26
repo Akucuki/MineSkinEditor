@@ -74,6 +74,9 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
+    // Color picker
+    implementation 'com.godaddy.android.colorpicker:compose-color-picker:0.7.0'
+
 }
 
 // called every time gradle gets executed, takes the native dependencies of

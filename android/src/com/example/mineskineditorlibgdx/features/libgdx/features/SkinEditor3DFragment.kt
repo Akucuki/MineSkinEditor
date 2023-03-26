@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -30,6 +30,7 @@ import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -90,14 +91,24 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                         painter = painterResource(R.drawable.bg_main),
                         contentScale = ContentScale.FillBounds
                     )
-                    AndroidView(
-                        modifier = Modifier.fillMaxSize(),
-                        factory = { libGDXView }
-                    )
                     Column(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Spacer(modifier = Modifier.weight(1f))
+                        AndroidView(
+                            modifier = Modifier.weight(1f),
+                            factory = { libGDXView }
+                        )
+                        RecentColorsBar(
+                            colors = listOf(
+                                Color.Blue,
+                                Color.Red,
+                                Color.Gray,
+                                Color.Green,
+                                Color.Cyan,
+                            ),
+                            onColorClick = {},
+                            selectedColor = Color.Gray
+                        )
                         BottomBar(
                             toolTypes = editorToolTypes,
                             selectedToolType = activeEditorToolType,
