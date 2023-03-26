@@ -1,18 +1,22 @@
-package com.example.mineskineditorlibgdx.features.libgdx.core.model.brush
+package com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools
 
+import androidx.annotation.FloatRange
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import kotlin.random.Random
 
-class Noise(private val thickness: Int, private val strength: Float) : PaintBrush {
+object NoiseTool : PaintTool {
 
-    init {
-        require(strength in 0f..1f) {
-            "Noise strenght should be in range [0, 1]"
-        }
-    }
-
-    override fun paint(x: Int, y: Int, color: Color, pixmap: Pixmap) {
+    override fun use(
+        x: Int,
+        y: Int,
+        color: Color,
+        pixmap: Pixmap,
+        thickness: Int,
+        @FloatRange(from = 0.0, to = 1.0)
+        strength: Float,
+        initialPixmap: Pixmap
+    ) {
         val halfThickness = thickness / 2
         val startX = x - halfThickness
         val endX = x + halfThickness

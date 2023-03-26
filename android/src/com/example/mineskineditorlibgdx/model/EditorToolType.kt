@@ -31,10 +31,6 @@ enum class EditorToolType {
             ERASER -> R.drawable.ic_eraser
         }
     }
-}
 
-data class EditorToolWrapper(
-    val type: EditorToolType,
-    val isActive: Boolean = false,
-    val isInOptionsMode: Boolean = false
-)
+    fun isPaintTool(): Boolean = this != UNDO
+}

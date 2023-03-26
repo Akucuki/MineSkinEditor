@@ -19,13 +19,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.mineskineditorlibgdx.application.theme.GrayColor
 import com.example.mineskineditorlibgdx.application.theme.YellowColor
-import com.example.mineskineditorlibgdx.model.EditorToolWrapper
+import com.example.mineskineditorlibgdx.model.EditorToolType
 
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
-    tools: List<EditorToolWrapper>,
-    onToolClick: (EditorToolWrapper) -> Unit
+    toolTypes: Array<EditorToolType>,
+    selectedToolType: EditorToolType,
+    onToolClick: (EditorToolType) -> Unit
 ) {
     Row(
         modifier = modifier
@@ -36,13 +37,13 @@ fun BottomBar(
             .navigationBarsPadding(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        tools.forEach { tool ->
+        toolTypes.forEach { type ->
             ToolButton(
                 modifier = Modifier.weight(1f),
-                isActive = tool.isActive,
-                onClick = { onToolClick(tool) },
-                iconId = tool.type.iconId(),
-                textId = tool.type.nameStringId()
+                isActive = type == selectedToolType,
+                onClick = { onToolClick(type) },
+                iconId = type.iconId(),
+                textId = type.nameStringId()
             )
         }
     }
