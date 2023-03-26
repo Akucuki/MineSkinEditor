@@ -28,6 +28,7 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -52,13 +53,13 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                 )
             }
 
-            val modelViewerGame = remember { ModelViewerGame() }
+            val skinEditor3D: SkinEditor3D = remember { ModelViewerGame() }
             val libGDXAppConfig = remember {
                 AndroidApplicationConfiguration().apply { a = 8 }
             }
-            val libGDXView = remember(modelViewerGame) {
+            val libGDXView = remember(skinEditor3D) {
                 initializeForView(
-                    modelViewerGame,
+                    skinEditor3D as ModelViewerGame,
                     libGDXAppConfig
                 ).apply {
                     if (this is SurfaceView) {
@@ -74,8 +75,8 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                 events.collect { event ->
                     when (event) {
                         is SkinEditor3DEvent.SetPaintTool -> {
-                            val paintBrush = event.editorPaintBrush
-                            modelViewerGame.paintTool = paintBrush
+                            val paintTool = event.paintTool
+                            skinEditor3D.setPaintTool(paintTool)
                         }
                     }
                 }

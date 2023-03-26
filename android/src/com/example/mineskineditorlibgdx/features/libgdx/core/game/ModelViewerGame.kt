@@ -11,13 +11,15 @@ import com.badlogic.gdx.graphics.g3d.Model
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.ScreenUtils
-import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.OnPaintGestureEndListener
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PencilTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.*
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
@@ -27,7 +29,7 @@ class ModelViewerGame(
     private val debugColorSecondary: Color = Color.BLUE,
     private val modelFilename: String = "character_custom.g3db",
     private val modelTextureFilename: String = "texture_steve.png"
-) : Game() {
+) : Game(), SkinEditor3D {
 
     private var environment: Environment? = null
     private var cam: Camera? = null
@@ -35,6 +37,7 @@ class ModelViewerGame(
     private var backgroundSpriteBatch: SpriteBatch? = null
     private var modelBatch: ModelBatch? = null
     private var instance: ModelInstance? = null
+    private var initialModelTexture: Texture? = null
     private var assets: AssetManager? = null
     private var areResourcesLoading: Boolean = true
 
@@ -58,7 +61,11 @@ class ModelViewerGame(
 
     private var modelTriangles: List<ModelTriangle>? = null
 
-    var paintTool: EditorTool = PencilTool
+    private var paintTool: PaintTool = PencilTool
+    private var paintColor: Color = Color.WHITE
+    private var paintThickness: Int = 1
+    private var noisePaintStrength: Float = 0.5f
+    private var onPaintGestureEndListener: OnPaintGestureEndListener? = null
 
     override fun create() {
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() called")
@@ -104,10 +111,10 @@ class ModelViewerGame(
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "finishResourcesLoading() called")
 
         val characterModel = assets!!.get(modelFilename, Model::class.java)
-        val modelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
+        initialModelTexture = assets!!.get(modelTextureFilename, Texture::class.java)
 
         instance = ModelInstance(characterModel)
-        instance!!.setFirstMaterialTexture(modelTexture)
+        instance!!.setFirstMaterialTexture(initialModelTexture!!)
         modelTriangles = instance!!.triangles()
 
         areResourcesLoading = false
@@ -182,10 +189,7 @@ class ModelViewerGame(
                     nearestIntersectedTriangle,
                     intersectionPoint
                 )
-                val instanceTextureAttribute =
-                    instance!!.materials.first()
-                        .get(TextureAttribute.Diffuse) as TextureAttribute
-                val texture = instanceTextureAttribute.textureDescription.texture
+                val texture = instance!!.firstMaterialTexture()
                 val uv = RaycastGeometry.getIntersectionUV(
                     intersectionPoint,
                     nearestIntersectedTriangle
@@ -211,8 +215,16 @@ class ModelViewerGame(
                 }
 
                 if (!texture.textureData.isPrepared) texture.textureData.prepare()
-                val pixmap = texture.textureData.consumePixmap()
-                paintTool.use()
+                val pixmap = texture.textureData.safeConsumePixmap()
+                paintTool.use(
+                    textureX,
+                    textureY,
+                    paintColor,
+                    pixmap,
+                    paintThickness,
+                    noisePaintStrength,
+                    initialModelTexture!!.textureData.safeConsumePixmap()
+                )
                 val newTexture = Texture(pixmap)
                 instance?.setFirstMaterialTexture(newTexture)
             }
@@ -224,5 +236,31 @@ class ModelViewerGame(
         debugTextureSpriteBatch?.dispose()
         modelBatch?.dispose()
         assets?.dispose()
+    }
+
+    override fun setPaintColor(color: Color) {
+        paintColor = color
+    }
+
+    override fun setPaintThickness(thickness: Int) {
+        paintThickness = thickness
+    }
+
+    override fun setNoisePaintStrength(strength: Float) {
+        noisePaintStrength = strength
+    }
+
+    override fun setTexture(texture: Texture) {
+        instance?.setFirstMaterialTexture(texture)
+    }
+
+    override fun getTexture(): Texture = instance!!.firstMaterialTexture()
+
+    override fun setPaintTool(paintTool: PaintTool) {
+        this.paintTool = paintTool
+    }
+
+    override fun setOnPaintMotionEndListener(listener: OnPaintGestureEndListener) {
+        onPaintGestureEndListener = listener
     }
 }

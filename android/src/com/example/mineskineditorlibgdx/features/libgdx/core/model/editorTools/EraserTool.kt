@@ -1,11 +1,9 @@
 package com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools
 
-import androidx.annotation.FloatRange
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import kotlin.random.Random
 
-object NoiseTool : PaintTool {
+object EraserTool : PaintTool {
 
     override fun use(
         x: Int,
@@ -13,7 +11,6 @@ object NoiseTool : PaintTool {
         color: Color,
         pixmap: Pixmap,
         thickness: Int,
-        @FloatRange(from = 0.0, to = 1.0)
         strength: Float,
         initialPixmap: Pixmap
     ) {
@@ -24,17 +21,9 @@ object NoiseTool : PaintTool {
         val endY = y + halfThickness
         for (i in startX..endX) {
             for (j in startY..endY) {
-                val noiseColor = getNoiseForColor(color, strength)
-                pixmap.drawPixel(i, j, Color.rgba8888(noiseColor))
+                val initialPixmapColor = Color(initialPixmap.getPixel(i, j))
+                pixmap.drawPixel(i, j, Color.rgba8888(initialPixmapColor))
             }
         }
-    }
-
-    private fun getNoiseForColor(color: Color, strength: Float): Color {
-        val noise = Random.nextFloat() * strength
-        val r = (color.r + noise).coerceIn(0f, 1f)
-        val g = (color.g + noise).coerceIn(0f, 1f)
-        val b = (color.b + noise).coerceIn(0f, 1f)
-        return Color(r, g, b, color.a)
     }
 }

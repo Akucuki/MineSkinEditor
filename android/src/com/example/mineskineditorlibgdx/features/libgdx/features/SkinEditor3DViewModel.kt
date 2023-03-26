@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 private const val TOOL_TYPES = "toolTypes"
 private const val ACTIVE_TOOL_TYPE = "activeToolType"
-private const val ARE_OPTIONS_VISIBLE = "areOptionsVisible"
+private const val ARE_TOOL_OPTIONS_VISIBLE = "areToolOptionsVisible"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
@@ -27,27 +27,30 @@ class SkinEditor3DViewModel @Inject constructor(
         ACTIVE_TOOL_TYPE,
         EditorToolType.PENCIL
     )
-    val areOptionsVisible = handle.getStateFlow(
-        ARE_OPTIONS_VISIBLE,
+    val areToolOptionsVisible = handle.getStateFlow(
+        ARE_TOOL_OPTIONS_VISIBLE,
         false
     )
 
+    init {
+        events.trySend(SkinEditor3DEvent.SetPaintTool(PencilTool))
+    }
 
 
     fun onToolClick(toolType: EditorToolType) {
         when (toolType) {
             activeToolType.value -> {
-                handle[ARE_OPTIONS_VISIBLE] = !areOptionsVisible.value
+                handle[ARE_TOOL_OPTIONS_VISIBLE] = toolType.isPaintTool() && !areToolOptionsVisible.value
             }
             else -> {
-                if (toolType != EditorToolType.UNDO) {
+                if (toolType.isPaintTool()) {
                     handle[ACTIVE_TOOL_TYPE] = toolType
                     val tool = when (toolType) {
                         EditorToolType.PENCIL -> PencilTool
                         EditorToolType.NOISE -> NoiseTool
                         EditorToolType.BRUSH -> BrushTool
                         EditorToolType.FILL -> FillTool
-                        else -> PencilTool
+                        else -> EraserTool
                     }
                     events.trySend(SkinEditor3DEvent.SetPaintTool(tool))
                 }

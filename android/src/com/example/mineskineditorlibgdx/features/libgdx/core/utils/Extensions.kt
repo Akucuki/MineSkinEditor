@@ -1,10 +1,7 @@
 package com.example.mineskineditorlibgdx.features.libgdx.core.utils
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Camera
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.VertexAttributes
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
@@ -17,6 +14,11 @@ import com.badlogic.gdx.math.Vector3
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
 private const val BYTES_IN_FLOAT = 4
+
+fun TextureData.safeConsumePixmap(): Pixmap {
+    if (!isPrepared) prepare()
+    return consumePixmap()
+}
 
 fun ShapeRenderer.safeDrawLine(
     cam: Camera,
@@ -81,6 +83,11 @@ fun SpriteBatch.safeDraw(
 
 fun ModelInstance.setFirstMaterialTexture(texture: Texture) {
     materials.first().set(TextureAttribute.createDiffuse(texture))
+}
+
+fun ModelInstance.firstMaterialTexture(): Texture {
+    val instanceTextureAttribute = materials.first().get(TextureAttribute.Diffuse) as TextureAttribute
+    return instanceTextureAttribute.textureDescription.texture
 }
 
 fun ModelInstance.triangles(): List<ModelTriangle> {

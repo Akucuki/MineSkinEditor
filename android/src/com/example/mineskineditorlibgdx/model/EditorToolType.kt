@@ -31,4 +31,6 @@ enum class EditorToolType {
             ERASER -> R.drawable.ic_eraser
         }
     }
+
+    fun isPaintTool(): Boolean = this != UNDO
 }
