@@ -32,6 +32,7 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGam
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.*
 import com.example.mineskineditorlibgdx.model.UiString
+import com.example.mineskineditorlibgdx.model.toColorEntries
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -137,9 +138,9 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             libGDXView
                         })
                         RecentColorsBar(
-                            colorEntries = recentColors,
+                            colorEntries = recentColors.toColorEntries(),
                             onColorClick = viewModel::onColorClick,
-                            selectedColor = selectedColor,
+                            selectedColor = selectedColor.toColorEntry(),
                             onColorPickerClick = viewModel::onColorPickerClick,
                             onPipetteClick = viewModel::onPipetteClick,
                             isPipetteActive = isInPipetteMode
@@ -154,7 +155,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                         ColorPickerDialog(
                             onDismissClick = viewModel::onColorPickerDialogCancelClick,
                             onOkClick = viewModel::onColorPickerDialogOkClick,
-                            initialColor = selectedColor.color
+                            initialColor = selectedColor.toColorEntry().color
                         )
                     }
                     if (isSkinNameChooserDialogVisible) {
