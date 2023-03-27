@@ -4,10 +4,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
 import com.example.mineskineditorlibgdx.model.ColorEntry
 import com.example.mineskineditorlibgdx.model.EditorToolType
+import com.example.mineskineditorlibgdx.model.UiString
+import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -27,10 +30,12 @@ private const val ARE_TOOL_OPTIONS_VISIBLE = "areToolOptionsVisible"
 private const val RECENT_COLORS = "recentColors"
 private const val SELECTED_COLOR = "selectedColor"
 private const val IS_IN_PIPETTE_MODE = "isInPipetteMode"
+private const val SKIN_NAME = "skinName"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
     private val handle: SavedStateHandle,
+    private val navigationDispatcher: NavigationDispatcher
 ) : ViewModel() {
 
     val events = Channel<SkinEditor3DEvent>(Channel.UNLIMITED)
@@ -62,6 +67,10 @@ class SkinEditor3DViewModel @Inject constructor(
     val isInPipetteMode = handle.getStateFlow(
         IS_IN_PIPETTE_MODE,
         false
+    )
+    val skinName = handle.getStateFlow(
+        SKIN_NAME,
+        UiString.StringResource(R.string.my_new_skin)
     )
 
     init {
@@ -139,5 +148,17 @@ class SkinEditor3DViewModel @Inject constructor(
     fun onColorPickerDialogOkClick(color: Color) {
         onColorAdded(color)
         _isColorPickerDialogVisible.value = false
+    }
+
+    fun onBackClick() {
+        navigationDispatcher.emit { it.popBackStack() }
+    }
+
+    fun onSaveClick() {
+        // TODO saving
+    }
+
+    fun onSkinNameChange(name: String) {
+        handle[SKIN_NAME] = UiString.SimpleString(name)
     }
 }

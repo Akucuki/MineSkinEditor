@@ -17,6 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -25,11 +26,14 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
+import com.example.mineskineditorlibgdx.features.composables.TopAppBar
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.ColorPickerDialog
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameBar
+import com.example.mineskineditorlibgdx.model.UiString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -75,6 +79,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
             val selectedColor by viewModel.selectedColor.collectAsState()
             val isColorPickerDialogVisible by viewModel.isColorPickerDialogVisible.collectAsState()
             val isInPipetteMode by viewModel.isInPipetteMode.collectAsState()
+            val skinNameUiString: UiString by viewModel.skinName.collectAsState()
 
             LaunchedEffect(Unit) {
                 events.collect { event ->
@@ -114,6 +119,17 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                     Column(
                         modifier = Modifier.fillMaxSize()
                     ) {
+                        TopAppBar(
+                            leadingIconId = R.drawable.ic_chevron_left,
+                            trailingIconId = R.drawable.ic_save,
+                            onLeadingButtonClick = viewModel::onBackClick,
+                            onTrailingButtonClick = viewModel::onSaveClick,
+                            title = stringResource(R.string.skin_editor)
+                        )
+                        SkinNameBar(
+                            name = skinNameUiString.asString(),
+                            onNameChange = viewModel::onSkinNameChange
+                        )
                         AndroidView(
                             modifier = Modifier
                                 .fillMaxWidth()
