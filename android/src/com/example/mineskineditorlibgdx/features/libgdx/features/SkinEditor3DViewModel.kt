@@ -9,6 +9,7 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
 import com.example.mineskineditorlibgdx.model.ColorEntry
 import com.example.mineskineditorlibgdx.model.EditorToolType
+import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
 import com.example.mineskineditorlibgdx.model.UiString
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
@@ -20,8 +21,11 @@ import java.util.*
 import javax.inject.Inject
 
 private const val RECENT_COLORS_COUNT = 5
+private const val SKIN_IMAGE_EXTENSION_SUFFIX = ".png"
 
-private val initialColors = Array(RECENT_COLORS_COUNT) { ColorEntry(color = Color.White) }
+private val initialColors = Array(RECENT_COLORS_COUNT) {
+    ColorEntry(color = Color.White).toParcelableColorEntry()
+}
 
 private const val TOOL_TYPES = "toolTypes"
 private const val ACTIVE_TOOL_TYPE = "activeToolType"
@@ -30,8 +34,6 @@ private const val RECENT_COLORS = "recentColors"
 private const val SELECTED_COLOR = "selectedColor"
 private const val IS_IN_PIPETTE_MODE = "isInPipetteMode"
 private const val SKIN_NAME = "skinName"
-
-private const val SKIN_IMAGE_EXTENSION_SUFFIX = ".png"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
@@ -55,7 +57,7 @@ class SkinEditor3DViewModel @Inject constructor(
     )
     var recentColors = handle.getStateFlow(
         RECENT_COLORS,
-        LinkedList<ColorEntry>().apply {
+        LinkedList<ParcelableColorEntry>().apply {
             addAll(initialColors)
         }
     )
@@ -124,7 +126,7 @@ class SkinEditor3DViewModel @Inject constructor(
         val colors = recentColors.value
 //        val colors = recentColors
         colors.removeLast()
-        colors.addFirst(newColorEntry)
+        colors.addFirst(newColorEntry.toParcelableColorEntry())
 //        recentColors.value = colors
         handle[RECENT_COLORS] = colors
         onColorClick(newColorEntry)

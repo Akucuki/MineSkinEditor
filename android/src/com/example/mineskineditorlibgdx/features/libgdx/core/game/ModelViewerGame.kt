@@ -97,7 +97,97 @@ class ModelViewerGame(
             update()
         }
 
-        camController = CameraInputController(cam)
+//        camController = CameraInputController(cam)
+        camController = object : CameraInputController(cam) {
+
+            var isSwipeOnModel: Boolean? = null
+
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                val ray = cam!!.getPickRay(screenX.toFloat(), screenY.toFloat())
+                isSwipeOnModel = modelTriangles?.any {
+                    RaycastGeometry.intersectRayTriangle(ray, it, null)
+                }
+                if (isSwipeOnModel == true) modelTouchProcessing(screenX, screenY)
+                return super.touchDown(screenX, screenY, pointer, button)
+            }
+
+            override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+                if (isSwipeOnModel == true) {
+                    modelTouchProcessing(screenX, screenY)
+                } else {
+                    super.touchDragged(screenX, screenY, pointer)
+                }
+                return false
+            }
+
+            private fun modelTouchProcessing(screenX: Int, screenY: Int) {
+                val ray = cam!!.getPickRay(screenX.toFloat(), screenY.toFloat())
+
+                if (debugLevel > DebugLevel.LIGHT) {
+                    debugRayStartPoint.set(ray.origin.sub(0f, .01f, 0f))
+                    debugRayEndPoint.set(ray.direction).scl(100f).add(debugRayStartPoint)
+                }
+
+                val intersectionTriangles = modelTriangles!!.filter {
+                    RaycastGeometry.intersectRayTriangle(ray, it, null)
+                }
+                val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
+                    cam!!.position.dst(it.centroid())
+                }
+
+                if (nearestIntersectedTriangle != null) {
+                    if (debugLevel > DebugLevel.LIGHT) {
+                        debugLastIntersectedTriangle = nearestIntersectedTriangle
+                    }
+
+                    val intersectionPoint = Vector3()
+                    RaycastGeometry.intersectRayTriangle(
+                        ray,
+                        nearestIntersectedTriangle,
+                        intersectionPoint
+                    )
+                    val texture = instance!!.firstMaterialTexture()
+                    val uv = RaycastGeometry.getIntersectionUV(
+                        intersectionPoint,
+                        nearestIntersectedTriangle
+                    )
+                    val textureX = (uv.x * texture.width).toInt()
+                    val textureY = (uv.y * texture.height).toInt()
+
+                    if (debugLevel > DebugLevel.LIGHT) {
+                        Gdx.app.log(
+                            logTag,
+                            "Intersection point: $intersectionPoint, UV: $uv, Texture: $textureX, $textureY"
+                        )
+                        Gdx.app.log(
+                            logTag,
+                            "UV: x: ${uv.x}, y: ${uv.y}"
+                        )
+                    }
+                    if (debugLevel > DebugLevel.NONE) {
+                        Gdx.app.log(
+                            logTag,
+                            "Texture: x: $textureX, y: $textureY"
+                        )
+                    }
+                    val pixmap = texture.textureData.safeConsumePixmap()
+                    if (isPaintEnabled) {
+                        paintTool.use(
+                            textureX,
+                            textureY,
+                            paintColor,
+                            pixmap,
+                            paintThickness,
+                            noisePaintStrength,
+                            initialModelTexture!!.textureData.safeConsumePixmap()
+                        )
+                        val newTexture = Texture(pixmap)
+                        instance?.setFirstMaterialTexture(newTexture)
+                    }
+                    onTextureColorPickListener?.invoke(Color(pixmap.getPixel(textureX, textureY)))
+                }
+            }
+        }
         Gdx.input.inputProcessor = camController
 
         val parameter = TextureLoader.TextureParameter().apply {
@@ -159,83 +249,6 @@ class ModelViewerGame(
                 color = debugColorSecondary,
                 lineWidth = 4f
             )
-        }
-
-        if (Gdx.input.justTouched()) {
-            if (debugLevel > DebugLevel.NONE) Gdx.app.log(logTag, "Scene touched!")
-
-            val ray = cam!!.getPickRay(
-                Gdx.input.x.toFloat(),
-                Gdx.input.y.toFloat(),
-                0f,
-                0f,
-                Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat()
-            )
-
-            if (debugLevel > DebugLevel.LIGHT) {
-                debugRayStartPoint.set(ray.origin.sub(0f, .01f, 0f))
-                debugRayEndPoint.set(ray.direction).scl(100f).add(debugRayStartPoint)
-            }
-
-            val intersectionTriangles = modelTriangles!!.filter {
-                RaycastGeometry.intersectRayTriangle(ray, it, null)
-            }
-            val nearestIntersectedTriangle = intersectionTriangles.minByOrNull {
-                cam!!.position.dst(it.centroid())
-            }
-
-            if (nearestIntersectedTriangle != null) {
-                if (debugLevel > DebugLevel.LIGHT) {
-                    debugLastIntersectedTriangle = nearestIntersectedTriangle
-                }
-
-                val intersectionPoint = Vector3()
-                RaycastGeometry.intersectRayTriangle(
-                    ray,
-                    nearestIntersectedTriangle,
-                    intersectionPoint
-                )
-                val texture = instance!!.firstMaterialTexture()
-                val uv = RaycastGeometry.getIntersectionUV(
-                    intersectionPoint,
-                    nearestIntersectedTriangle
-                )
-                val textureX = (uv.x * texture.width).toInt()
-                val textureY = (uv.y * texture.height).toInt()
-
-                if (debugLevel > DebugLevel.LIGHT) {
-                    Gdx.app.log(
-                        logTag,
-                        "Intersection point: $intersectionPoint, UV: $uv, Texture: $textureX, $textureY"
-                    )
-                    Gdx.app.log(
-                        logTag,
-                        "UV: x: ${uv.x}, y: ${uv.y}"
-                    )
-                }
-                if (debugLevel > DebugLevel.NONE) {
-                    Gdx.app.log(
-                        logTag,
-                        "Texture: x: $textureX, y: $textureY"
-                    )
-                }
-                val pixmap = texture.textureData.safeConsumePixmap()
-                if (isPaintEnabled) {
-                    paintTool.use(
-                        textureX,
-                        textureY,
-                        paintColor,
-                        pixmap,
-                        paintThickness,
-                        noisePaintStrength,
-                        initialModelTexture!!.textureData.safeConsumePixmap()
-                    )
-                    val newTexture = Texture(pixmap)
-                    instance?.setFirstMaterialTexture(newTexture)
-                }
-                onTextureColorPickListener?.invoke(Color(pixmap.getPixel(textureX, textureY)))
-            }
         }
     }
 
