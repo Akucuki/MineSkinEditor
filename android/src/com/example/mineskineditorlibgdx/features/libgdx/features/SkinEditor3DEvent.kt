@@ -5,7 +5,7 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.model.OnTextureColo
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
 
 
-sealed class SkinEditor3DEvent() {
+sealed class SkinEditor3DEvent {
     data class SetPaintTool(val paintTool: PaintTool) : SkinEditor3DEvent()
     data class SetOnTextureColorPickListener(val listener: OnTextureColorPickListener) : SkinEditor3DEvent()
     data class SetIsPaintEnabled(val isEnabled: Boolean) : SkinEditor3DEvent()
