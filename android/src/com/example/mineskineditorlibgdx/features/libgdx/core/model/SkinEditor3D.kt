@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
 
 typealias OnPaintGestureEndListener = () -> Unit
+typealias OnTextureColorPickListener = (color: Color) -> Unit
 
 interface SkinEditor3D {
 
@@ -16,4 +17,6 @@ interface SkinEditor3D {
     fun getTexture(): Texture
     fun setPaintTool(paintTool: PaintTool)
     fun setOnPaintMotionEndListener(listener: OnPaintGestureEndListener)
+    fun setOnTextureColorPickListener(listener: OnTextureColorPickListener)
+    fun setIsPaintEnabled(isEnabled: Boolean)
 }

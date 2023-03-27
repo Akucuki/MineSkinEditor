@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
+import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
 import com.example.mineskineditorlibgdx.model.ColorEntry
 import com.example.mineskineditorlibgdx.model.EditorToolType
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
@@ -25,6 +26,7 @@ private const val ACTIVE_TOOL_TYPE = "activeToolType"
 private const val ARE_TOOL_OPTIONS_VISIBLE = "areToolOptionsVisible"
 private const val RECENT_COLORS = "recentColors"
 private const val SELECTED_COLOR = "selectedColor"
+private const val IS_IN_PIPETTE_MODE = "isInPipetteMode"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
@@ -57,9 +59,16 @@ class SkinEditor3DViewModel @Inject constructor(
     )
     private val _isColorPickerDialogVisible = MutableStateFlow(false)
     val isColorPickerDialogVisible = _isColorPickerDialogVisible.asStateFlow()
+    val isInPipetteMode = handle.getStateFlow(
+        IS_IN_PIPETTE_MODE,
+        false
+    )
 
     init {
         events.trySend(SkinEditor3DEvent.SetPaintTool(PencilTool))
+        events.trySend(
+            SkinEditor3DEvent.SetOnTextureColorPickListener { onTextureColorPick(it.toCompose()) }
+        )
         viewModelScope.launch {
             _isColorPickerDialogVisible.collect { isPickerVisible ->
                 events.trySend(SkinEditor3DEvent.SetVisible(!isPickerVisible))
@@ -112,7 +121,15 @@ class SkinEditor3DViewModel @Inject constructor(
     }
 
     fun onPipetteClick() {
+        handle[IS_IN_PIPETTE_MODE] = !isInPipetteMode.value
+        events.trySend(SkinEditor3DEvent.SetIsPaintEnabled(!isInPipetteMode.value))
+    }
 
+    private fun onTextureColorPick(color: Color) {
+        if (isInPipetteMode.value) {
+            onPipetteClick()
+            onColorAdded(color)
+        }
     }
 
     fun onColorPickerDialogCancelClick() {

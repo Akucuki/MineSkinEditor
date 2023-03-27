@@ -74,6 +74,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
             val recentColors by viewModel.recentColors.collectAsState()
             val selectedColor by viewModel.selectedColor.collectAsState()
             val isColorPickerDialogVisible by viewModel.isColorPickerDialogVisible.collectAsState()
+            val isInPipetteMode by viewModel.isInPipetteMode.collectAsState()
 
             LaunchedEffect(Unit) {
                 events.collect { event ->
@@ -89,6 +90,14 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                         is SkinEditor3DEvent.SetVisible -> {
                             val isVisible = event.isVisible
                             skinEditor3D.setVisible(isVisible)
+                        }
+                        is SkinEditor3DEvent.SetOnTextureColorPickListener -> {
+                            val listener = event.listener
+                            skinEditor3D.setOnTextureColorPickListener(listener)
+                        }
+                        is SkinEditor3DEvent.SetIsPaintEnabled -> {
+                            val isEnabled = event.isEnabled
+                            skinEditor3D.setIsPaintEnabled(isEnabled)
                         }
                     }
                 }
@@ -118,7 +127,8 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             onColorClick = viewModel::onColorClick,
                             selectedColor = selectedColor,
                             onColorPickerClick = viewModel::onColorPickerClick,
-                            onPipetteClick = viewModel::onPipetteClick
+                            onPipetteClick = viewModel::onPipetteClick,
+                            isPipetteActive = isInPipetteMode
                         )
                         BottomBar(
                             toolTypes = editorToolTypes,
