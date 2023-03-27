@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -26,7 +27,13 @@ fun RecentColorsBar(
     onColorClick: (ColorEntry) -> Unit,
     onColorPickerClick: () -> Unit,
     onPipetteClick: () -> Unit,
+    isPipetteActive: Boolean
 ) {
+    val pipetteBorderModifier = if (isPipetteActive) {
+        Modifier.border(2.dp, Color.Black, CircleShape)
+    } else {
+        Modifier
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -49,7 +56,7 @@ fun RecentColorsBar(
                 isSelected = entry.uuid == selectedColor.uuid
             )
         }
-        IconButton(onClick = onPipetteClick) {
+        IconButton(onClick = onPipetteClick, modifier = pipetteBorderModifier) {
             Icon(
                 painter = painterResource(R.drawable.ic_pipette),
                 contentDescription = null,

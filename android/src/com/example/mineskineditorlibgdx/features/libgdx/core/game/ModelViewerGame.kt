@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.ScreenUtils
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.OnPaintGestureEndListener
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.OnTextureColorPickListener
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PencilTool
@@ -61,11 +62,13 @@ class ModelViewerGame(
 
     private var modelTriangles: List<ModelTriangle>? = null
 
+    private var isPaintEnabled = true
     private var paintTool: PaintTool = PencilTool
     private var paintColor: Color = Color.WHITE
     private var paintThickness: Int = 4
     private var noisePaintStrength: Float = 0.5f
     private var onPaintGestureEndListener: OnPaintGestureEndListener? = null
+    private var onTextureColorPickListener: OnTextureColorPickListener? = null
 
     private var isVisible = true
 
@@ -217,20 +220,21 @@ class ModelViewerGame(
                         "Texture: x: $textureX, y: $textureY"
                     )
                 }
-
-                if (!texture.textureData.isPrepared) texture.textureData.prepare()
                 val pixmap = texture.textureData.safeConsumePixmap()
-                paintTool.use(
-                    textureX,
-                    textureY,
-                    paintColor,
-                    pixmap,
-                    paintThickness,
-                    noisePaintStrength,
-                    initialModelTexture!!.textureData.safeConsumePixmap()
-                )
-                val newTexture = Texture(pixmap)
-                instance?.setFirstMaterialTexture(newTexture)
+                if (isPaintEnabled) {
+                    paintTool.use(
+                        textureX,
+                        textureY,
+                        paintColor,
+                        pixmap,
+                        paintThickness,
+                        noisePaintStrength,
+                        initialModelTexture!!.textureData.safeConsumePixmap()
+                    )
+                    val newTexture = Texture(pixmap)
+                    instance?.setFirstMaterialTexture(newTexture)
+                }
+                onTextureColorPickListener?.invoke(Color(pixmap.getPixel(textureX, textureY)))
             }
         }
     }
@@ -268,7 +272,15 @@ class ModelViewerGame(
         onPaintGestureEndListener = listener
     }
 
+    override fun setOnTextureColorPickListener(listener: OnTextureColorPickListener) {
+        onTextureColorPickListener = listener
+    }
+
     override fun setVisible(isVisible: Boolean) {
         this.isVisible = isVisible
+    }
+
+    override fun setIsPaintEnabled(isEnabled: Boolean) {
+        this.isPaintEnabled = isEnabled
     }
 }

@@ -15,6 +15,10 @@ import com.example.mineskineditorlibgdx.model.ModelTriangle
 
 private const val BYTES_IN_FLOAT = 4
 
+fun Color.toCompose(): androidx.compose.ui.graphics.Color {
+    return androidx.compose.ui.graphics.Color(r, g, b, a)
+}
+
 fun TextureData.safeConsumePixmap(): Pixmap {
     if (!isPrepared) prepare()
     return consumePixmap()
