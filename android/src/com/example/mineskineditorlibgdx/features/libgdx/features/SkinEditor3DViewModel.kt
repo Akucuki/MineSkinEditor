@@ -14,8 +14,7 @@ import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -31,6 +30,8 @@ private const val RECENT_COLORS = "recentColors"
 private const val SELECTED_COLOR = "selectedColor"
 private const val IS_IN_PIPETTE_MODE = "isInPipetteMode"
 private const val SKIN_NAME = "skinName"
+
+private const val SKIN_IMAGE_EXTENSION_SUFFIX = ".png"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
@@ -68,10 +69,12 @@ class SkinEditor3DViewModel @Inject constructor(
         IS_IN_PIPETTE_MODE,
         false
     )
-    val skinName = handle.getStateFlow(
+    val skinName: StateFlow<UiString> = handle.getStateFlow(
         SKIN_NAME,
         UiString.StringResource(R.string.my_new_skin)
     )
+    private val _isSkinNameChooserVisible = MutableStateFlow(false)
+    val isSkinNameChooserVisible = _isSkinNameChooserVisible.asStateFlow()
 
     init {
         events.trySend(SkinEditor3DEvent.SetPaintTool(PencilTool))
@@ -79,8 +82,10 @@ class SkinEditor3DViewModel @Inject constructor(
             SkinEditor3DEvent.SetOnTextureColorPickListener { onTextureColorPick(it.toCompose()) }
         )
         viewModelScope.launch {
-            _isColorPickerDialogVisible.collect { isPickerVisible ->
-                events.trySend(SkinEditor3DEvent.SetVisible(!isPickerVisible))
+            _isColorPickerDialogVisible.combine(_isSkinNameChooserVisible) { pickerVisible, nameChooserVisible ->
+                pickerVisible || nameChooserVisible
+            }.collect {
+                events.trySend(SkinEditor3DEvent.SetVisible(!it))
             }
         }
     }
@@ -155,7 +160,25 @@ class SkinEditor3DViewModel @Inject constructor(
     }
 
     fun onSaveClick() {
-        // TODO saving
+        _isSkinNameChooserVisible.value = true
+    }
+
+    fun onSkinNameChooserCancelClick() {
+        _isSkinNameChooserVisible.value = false
+    }
+
+    fun onSkinNameChooserSaveClick() {
+        _isSkinNameChooserVisible.value = false
+        events.trySend(
+            SkinEditor3DEvent.SaveSkinToLocalStorage(
+                skinName.value,
+                SKIN_IMAGE_EXTENSION_SUFFIX
+            )
+        )
+    }
+
+    fun onSkinNameClearClick() {
+        handle[SKIN_NAME] = UiString.SimpleString("")
     }
 
     fun onSkinNameChange(name: String) {
