@@ -283,4 +283,11 @@ class ModelViewerGame(
     override fun setIsPaintEnabled(isEnabled: Boolean) {
         this.isPaintEnabled = isEnabled
     }
+
+    override fun saveSkinToAppStorage(name: String) {
+        val currentTexture = instance!!.firstMaterialTexture()
+        val currentPixmap = currentTexture.textureData.safeConsumePixmap()
+        val file = Gdx.files.local(name)
+        PixmapIO.writePNG(file, currentPixmap)
+    }
 }

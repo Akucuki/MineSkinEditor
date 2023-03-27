@@ -19,4 +19,5 @@ interface SkinEditor3D {
     fun setOnPaintMotionEndListener(listener: OnPaintGestureEndListener)
     fun setOnTextureColorPickListener(listener: OnTextureColorPickListener)
     fun setIsPaintEnabled(isEnabled: Boolean)
+    fun saveSkinToAppStorage(name: String)
 }

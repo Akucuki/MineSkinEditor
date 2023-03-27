@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,10 +30,7 @@ import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.composables.TopAppBar
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.ColorPickerDialog
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.*
 import com.example.mineskineditorlibgdx.model.UiString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -43,17 +41,14 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
     private val viewModel: SkinEditor3DViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ) = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
 
             val events = remember(viewModel.events, viewLifecycleOwner) {
                 viewModel.events.receiveAsFlow().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.STARTED
+                    viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED
                 )
             }
 
@@ -63,8 +58,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
             }
             val libGDXView = remember(skinEditor3D) {
                 initializeForView(
-                    skinEditor3D as ModelViewerGame,
-                    libGDXAppConfig
+                    skinEditor3D as ModelViewerGame, libGDXAppConfig
                 ).apply {
                     if (this is SurfaceView) {
                         setZOrderOnTop(true)
@@ -73,6 +67,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                     }
                 }
             }
+            val context = LocalContext.current
             val editorToolTypes by viewModel.toolTypes.collectAsState()
             val activeEditorToolType by viewModel.activeToolType.collectAsState()
             val recentColors by viewModel.recentColors.collectAsState()
@@ -80,6 +75,7 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
             val isColorPickerDialogVisible by viewModel.isColorPickerDialogVisible.collectAsState()
             val isInPipetteMode by viewModel.isInPipetteMode.collectAsState()
             val skinNameUiString: UiString by viewModel.skinName.collectAsState()
+            val isSkinNameChooserDialogVisible by viewModel.isSkinNameChooserVisible.collectAsState()
 
             LaunchedEffect(Unit) {
                 events.collect { event ->
@@ -103,6 +99,11 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                         is SkinEditor3DEvent.SetIsPaintEnabled -> {
                             val isEnabled = event.isEnabled
                             skinEditor3D.setIsPaintEnabled(isEnabled)
+                        }
+                        is SkinEditor3DEvent.SaveSkinToLocalStorage -> {
+                            val skinName = event.name
+                            val extension = event.extension
+                            skinEditor3D.saveSkinToAppStorage(skinName.asString(context) + extension)
                         }
                     }
                 }
@@ -130,14 +131,11 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             name = skinNameUiString.asString(),
                             onNameChange = viewModel::onSkinNameChange
                         )
-                        AndroidView(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            factory = {
-                                libGDXView
-                            }
-                        )
+                        AndroidView(modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f), factory = {
+                            libGDXView
+                        })
                         RecentColorsBar(
                             colorEntries = recentColors,
                             onColorClick = viewModel::onColorClick,
@@ -157,6 +155,15 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             onDismissClick = viewModel::onColorPickerDialogCancelClick,
                             onOkClick = viewModel::onColorPickerDialogOkClick,
                             initialColor = selectedColor.color
+                        )
+                    }
+                    if (isSkinNameChooserDialogVisible) {
+                        SkinNameChooserDialog(
+                            onDismissClick = viewModel::onSkinNameChooserCancelClick,
+                            onSaveClick = viewModel::onSkinNameChooserSaveClick,
+                            skinName = skinNameUiString.asString(),
+                            onSkinNameChange = viewModel::onSkinNameChange,
+                            onClearNameClick = viewModel::onSkinNameClearClick
                         )
                     }
                 }

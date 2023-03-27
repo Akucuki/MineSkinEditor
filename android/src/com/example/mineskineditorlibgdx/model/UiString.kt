@@ -1,5 +1,6 @@
 package com.example.mineskineditorlibgdx.model
 
+import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
@@ -20,8 +21,13 @@ sealed class UiString {
     ) : UiString(), Parcelable
 
     @Composable
-    fun asString(): String = when(this) {
+    fun asString(): String = when (this) {
         is StringResource -> stringResource(stringId)
+        is SimpleString -> string
+    }
+
+    fun asString(context: Context) = when (this) {
+        is StringResource -> context.getString(stringId)
         is SimpleString -> string
     }
 }

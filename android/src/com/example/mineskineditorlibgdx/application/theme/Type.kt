@@ -26,6 +26,12 @@ val Typography = Typography(
         fontWeight = FontWeight.W500,
         fontSize = 12.sp
     ),
+    h1 = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.W700,
+        fontSize = 32.sp,
+        lineHeight = 34.sp
+    ),
     h2 = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.W700,

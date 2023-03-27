@@ -2,8 +2,6 @@ package com.example.mineskineditorlibgdx.application.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
@@ -17,3 +15,4 @@ val CancelButtonBackgroundGradientEndColor = Color(0xFFFCF5F9)
 val OkButtonBackgroundGradientStartColor = Color(0xFFFED441)
 val OkButtonBackgroundGradientEndColor = Color(0xFFF4933D)
 val OrangeColor = Color(0xFFFF8A00)
+val LightOrangeColor = Color(0xFFF9B96E)
