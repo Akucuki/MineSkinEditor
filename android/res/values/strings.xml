@@ -9,5 +9,7 @@
     <string name="fill">Fill</string>
     <string name="undo">Undo</string>
     <string name="eraser">Eraser</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

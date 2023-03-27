@@ -16,13 +16,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.PurpleColor
+import com.example.mineskineditorlibgdx.model.ColorEntry
 
 @Composable
 fun RecentColorsBar(
     modifier: Modifier = Modifier,
-    colors: List<Color>,
-    selectedColor: Color,
-    onColorClick: (Color) -> Unit
+    colorEntries: List<ColorEntry>,
+    selectedColor: ColorEntry,
+    onColorClick: (ColorEntry) -> Unit,
+    onColorPickerClick: () -> Unit,
+    onPipetteClick: () -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -32,21 +35,21 @@ fun RecentColorsBar(
             .padding(vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onColorPickerClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_color_picker),
                 contentDescription = null,
                 tint = PurpleColor
             )
         }
-        colors.forEach { color ->
+        colorEntries.forEach { entry ->
             ColorButton(
-                color = color,
-                onClick = { onColorClick(color) },
-                isSelected = color == selectedColor
+                color = entry.color,
+                onClick = { onColorClick(entry) },
+                isSelected = entry.uuid == selectedColor.uuid
             )
         }
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onPipetteClick) {
             Icon(
                 painter = painterResource(R.drawable.ic_pipette),
                 contentDescription = null,
@@ -67,7 +70,11 @@ private fun ColorButton(
     val borderModifier = if (isSelected) {
         Modifier.border(width = 2.dp, color = Color.Black, shape = roundedCornerShape)
     } else {
-        Modifier
+        Modifier.border(
+            width = 0.dp,
+            color = Color.Black.copy(alpha = .4f),
+            shape = roundedCornerShape
+        )
     }
     Box(
         modifier = modifier

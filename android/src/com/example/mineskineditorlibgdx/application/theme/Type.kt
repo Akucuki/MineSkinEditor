@@ -25,7 +25,12 @@ val Typography = Typography(
         fontFamily = Poppins,
         fontWeight = FontWeight.W500,
         fontSize = 12.sp
-    )
+    ),
+    h3 = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.W900,
+        fontSize = 22.sp
+    ),
     /* Other default text styles to override
     button = TextStyle(
         fontFamily = FontFamily.Default,
