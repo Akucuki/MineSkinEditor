@@ -63,9 +63,11 @@ class ModelViewerGame(
 
     private var paintTool: PaintTool = PencilTool
     private var paintColor: Color = Color.WHITE
-    private var paintThickness: Int = 1
+    private var paintThickness: Int = 4
     private var noisePaintStrength: Float = 0.5f
     private var onPaintGestureEndListener: OnPaintGestureEndListener? = null
+
+    private var isVisible = true
 
     override fun create() {
         if (debugLevel == DebugLevel.FULL) Gdx.app.log(logTag, "create() called")
@@ -126,6 +128,8 @@ class ModelViewerGame(
     override fun render() {
         ScreenUtils.clear(0f, 0f, 0f, 0f)
         if (areResourcesLoading && assets?.update() == true) finishResourcesLoading()
+
+        if (!isVisible) return
 
         camController?.update()
 
@@ -262,5 +266,9 @@ class ModelViewerGame(
 
     override fun setOnPaintMotionEndListener(listener: OnPaintGestureEndListener) {
         onPaintGestureEndListener = listener
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        this.isVisible = isVisible
     }
 }

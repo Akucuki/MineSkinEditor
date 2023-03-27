@@ -8,6 +8,7 @@ typealias OnPaintGestureEndListener = () -> Unit
 
 interface SkinEditor3D {
 
+    fun setVisible(isVisible: Boolean)
     fun setPaintColor(color: Color)
     fun setPaintThickness(thickness: Int)
     fun setNoisePaintStrength(strength: Float)
