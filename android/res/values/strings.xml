@@ -14,5 +14,7 @@
     <string name="my_new_skin">My New Skin</string>
     <string name="choose_name_for_skin">Choose a name for your skin</string>
     <string name="save">Save</string>
+    <string name="size">Size</string>
+    <string name="effect">Effect</string>
 
 </resources>

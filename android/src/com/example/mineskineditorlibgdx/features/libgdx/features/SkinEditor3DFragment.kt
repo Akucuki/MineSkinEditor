@@ -77,6 +77,10 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
             val isInPipetteMode by viewModel.isInPipetteMode.collectAsState()
             val skinNameUiString: UiString by viewModel.skinName.collectAsState()
             val isSkinNameChooserDialogVisible by viewModel.isSkinNameChooserVisible.collectAsState()
+            val additionalOptionsType by viewModel.additionalOptionsType.collectAsState()
+            val areAdditionalOptionsVisible by viewModel.areToolOptionsVisible.collectAsState()
+            val effectValue by viewModel.effectValue.collectAsState()
+            val selectedSize by viewModel.selectedThicknessType.collectAsState()
 
             LaunchedEffect(Unit) {
                 events.collect { event ->
@@ -105,6 +109,14 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             val skinName = event.name
                             val extension = event.extension
                             skinEditor3D.saveSkinToAppStorage(skinName.asString(context) + extension)
+                        }
+                        is SkinEditor3DEvent.SetToolEffect -> {
+                            val effect = event.toolEffect
+                            skinEditor3D.setNoisePaintStrength(effect)
+                        }
+                        is SkinEditor3DEvent.SetToolSize -> {
+                            val size = event.toolSize
+                            skinEditor3D.setPaintThickness(size)
                         }
                     }
                 }
@@ -143,7 +155,14 @@ class SkinEditor3DFragment : AndroidFragmentApplication() {
                             selectedColor = selectedColor.toColorEntry(),
                             onColorPickerClick = viewModel::onColorPickerClick,
                             onPipetteClick = viewModel::onPipetteClick,
-                            isPipetteActive = isInPipetteMode
+                            isPipetteActive = isInPipetteMode,
+                            additionalOptionsType = additionalOptionsType,
+                            onSizeChosen = viewModel::onSizeChosen,
+                            onEffectChange = viewModel::onEffectChange,
+                            onEffectChangeEnded = viewModel::onEffectChangeEnded,
+                            areAdditionalOptionsVisible = areAdditionalOptionsVisible,
+                            effectValue = effectValue,
+                            selectedSize = selectedSize
                         )
                         BottomBar(
                             toolTypes = editorToolTypes,

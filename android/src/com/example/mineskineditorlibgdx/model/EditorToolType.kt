@@ -33,4 +33,29 @@ enum class EditorToolType {
     }
 
     fun isPaintTool(): Boolean = this != UNDO
+
+    fun toAdditionalOptionsType(): AdditionalOptionsType {
+        return when(this) {
+            PENCIL -> AdditionalOptionsType.NONE
+            NOISE -> AdditionalOptionsType.ALL
+            BRUSH -> AdditionalOptionsType.SIZE
+            FILL -> AdditionalOptionsType.NONE
+            UNDO -> AdditionalOptionsType.NONE
+            ERASER -> AdditionalOptionsType.SIZE
+        }
+    }
+}
+
+enum class EditorToolThickness(val thickness: Int) {
+    PX1(1),
+    PX2(2),
+    PX4(4),
+    PX6(6),
+    PX8(8)
+}
+
+enum class AdditionalOptionsType {
+    NONE,
+    SIZE,
+    ALL
 }
