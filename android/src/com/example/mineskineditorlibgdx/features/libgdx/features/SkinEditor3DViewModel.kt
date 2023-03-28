@@ -7,10 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
-import com.example.mineskineditorlibgdx.model.ColorEntry
-import com.example.mineskineditorlibgdx.model.EditorToolType
-import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
-import com.example.mineskineditorlibgdx.model.UiString
+import com.example.mineskineditorlibgdx.model.*
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +31,8 @@ private const val RECENT_COLORS = "recentColors"
 private const val SELECTED_COLOR = "selectedColor"
 private const val IS_IN_PIPETTE_MODE = "isInPipetteMode"
 private const val SKIN_NAME = "skinName"
+private const val SELECTED_EFFECT_VALUE = "selectedEffectValue"
+private const val SELECTED_SIZE_TYPE = "selectedSizeType"
 
 @HiltViewModel
 class SkinEditor3DViewModel @Inject constructor(
@@ -77,6 +76,21 @@ class SkinEditor3DViewModel @Inject constructor(
     )
     private val _isSkinNameChooserVisible = MutableStateFlow(false)
     val isSkinNameChooserVisible = _isSkinNameChooserVisible.asStateFlow()
+    val additionalOptionsType = activeToolType.map {
+        it.toAdditionalOptionsType()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        AdditionalOptionsType.NONE
+    )
+    val effectValue = handle.getStateFlow(
+        SELECTED_EFFECT_VALUE,
+        0f
+    )
+    val selectedThicknessType = handle.getStateFlow(
+        SELECTED_SIZE_TYPE,
+        EditorToolThickness.PX1
+    )
 
     init {
         events.trySend(SkinEditor3DEvent.SetPaintTool(PencilTool))
@@ -94,13 +108,17 @@ class SkinEditor3DViewModel @Inject constructor(
 
 
     fun onToolClick(toolType: EditorToolType) {
-        handle[ARE_TOOL_OPTIONS_VISIBLE] = false
         when (toolType) {
             activeToolType.value -> {
-                handle[ARE_TOOL_OPTIONS_VISIBLE] =
-                    toolType.isPaintTool() && !areToolOptionsVisible.value
+                if (
+                    toolType.isPaintTool() &&
+                    toolType.toAdditionalOptionsType() != AdditionalOptionsType.NONE
+                ) {
+                    handle[ARE_TOOL_OPTIONS_VISIBLE] = !areToolOptionsVisible.value
+                }
             }
             else -> {
+                handle[ARE_TOOL_OPTIONS_VISIBLE] = false
                 if (toolType.isPaintTool()) {
                     handle[ACTIVE_TOOL_TYPE] = toolType
                     val tool = when (toolType) {
@@ -117,7 +135,7 @@ class SkinEditor3DViewModel @Inject constructor(
     }
 
     fun onColorClick(colorEntry: ColorEntry) {
-        handle[SELECTED_COLOR] = colorEntry
+        handle[SELECTED_COLOR] = colorEntry.toParcelableColorEntry()
         events.trySend(SkinEditor3DEvent.SetPaintColor(colorEntry.color.toLibGDXColor()))
     }
 
@@ -185,5 +203,18 @@ class SkinEditor3DViewModel @Inject constructor(
 
     fun onSkinNameChange(name: String) {
         handle[SKIN_NAME] = UiString.SimpleString(name)
+    }
+
+    fun onEffectChange(value: Float) {
+        handle[SELECTED_EFFECT_VALUE] = value
+    }
+
+    fun onEffectChangeEnded() {
+        events.trySend(SkinEditor3DEvent.SetToolEffect(effectValue.value))
+    }
+
+    fun onSizeChosen(type: EditorToolThickness) {
+        handle[SELECTED_SIZE_TYPE] = type
+        events.trySend(SkinEditor3DEvent.SetToolSize(type.thickness))
     }
 }
