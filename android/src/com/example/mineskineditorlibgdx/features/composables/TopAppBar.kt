@@ -16,10 +16,10 @@ import androidx.compose.ui.unit.dp
 fun TopAppBar(
     modifier: Modifier = Modifier,
     @DrawableRes
-    leadingIconId: Int,
+    leadingIconId: Int? = null,
     @DrawableRes
     trailingIconId: Int,
-    onLeadingButtonClick: () -> Unit,
+    onLeadingButtonClick: () -> Unit = {},
     onTrailingButtonClick: () -> Unit,
     title: String
 ) {
@@ -31,14 +31,16 @@ fun TopAppBar(
             .padding(horizontal = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(
-            onClick = onLeadingButtonClick,
-        ) {
-            Icon(
-                painter = painterResource(id = leadingIconId),
-                contentDescription = null,
-                tint = Color.White
-            )
+        leadingIconId?.let {
+            IconButton(
+                onClick = onLeadingButtonClick,
+            ) {
+                Icon(
+                    painter = painterResource(id = it),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         }
         Text(
             text = title,
