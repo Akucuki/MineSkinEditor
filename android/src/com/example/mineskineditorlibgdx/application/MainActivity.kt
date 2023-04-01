@@ -2,12 +2,14 @@ package com.example.mineskineditorlibgdx.application
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.example.mineskineditorlibgdx.R
+import com.example.mineskineditorlibgdx.application.theme.GrayColor
 import com.example.mineskineditorlibgdx.databinding.ActivityMainBinding
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +36,24 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        with(binding.bottomNavigationView) {
+            setBackgroundColor(GrayColor.toArgb())
+            itemIconTintList = null
+            setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.nav_create -> {
+                        navigationDispatcher.emit { it.navigate(R.id.fragmentSkinEditor) }
+                        true
+                    }
+                    R.id.nav_content -> {
+                        navigationDispatcher.emit { it.navigate(R.id.fragmentSkinEditor) }
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+        }
         setContentView(binding.root)
         applyEdgeToEdge()
         lifecycleScope.apply {
@@ -49,7 +69,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentSkinEditor
+    private fun provideStartDestination(): Int = R.id.fragmentHome
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->
