@@ -7,6 +7,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -16,36 +17,40 @@ import androidx.compose.ui.unit.dp
 fun TopAppBar(
     modifier: Modifier = Modifier,
     @DrawableRes
-    leadingIconId: Int,
+    leadingIconId: Int? = null,
     @DrawableRes
     trailingIconId: Int,
-    onLeadingButtonClick: () -> Unit,
+    onLeadingButtonClick: () -> Unit = {},
     onTrailingButtonClick: () -> Unit,
     title: String
 ) {
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
             .height(48.dp)
             .padding(horizontal = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(
-            onClick = onLeadingButtonClick,
-        ) {
-            Icon(
-                painter = painterResource(id = leadingIconId),
-                contentDescription = null,
-                tint = Color.White
-            )
+        leadingIconId?.let {
+            IconButton(
+                modifier = Modifier.align(Alignment.CenterStart),
+                onClick = onLeadingButtonClick,
+            ) {
+                Icon(
+                    painter = painterResource(id = it),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
         }
         Text(
+            modifier = Modifier.align(Alignment.Center),
             text = title,
             style = MaterialTheme.typography.h2,
             color = Color.White
         )
         IconButton(
+            modifier = Modifier.align(Alignment.CenterEnd),
             onClick = onTrailingButtonClick
         ) {
             Icon(

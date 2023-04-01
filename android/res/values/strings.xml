@@ -16,5 +16,13 @@
     <string name="save">Save</string>
     <string name="size">Size</string>
     <string name="effect">Effect</string>
+    <string name="crafty_craft">Crafty Craft</string>
+    <string name="create_skin">CREATE SKIN</string>
+    <string name="create_addon">CREATE ADDON</string>
+    <string name="home_caption">
+        Create your first screen by pressing "CREATE SKIN" or "CREATE ADDON"
+    </string>
+    <string name="create">Create</string>
+    <string name="content">Content</string>
 
 </resources>
