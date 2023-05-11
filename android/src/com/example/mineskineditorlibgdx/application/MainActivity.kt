@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
                         true
                     }
                     R.id.nav_content -> {
-                        navigationDispatcher.emit { it.navigate(R.id.fragmentSkinEditor) }
+                        navigationDispatcher.emit { it.navigate(R.id.fragmentContent) }
                         true
                     }
                     else -> false
