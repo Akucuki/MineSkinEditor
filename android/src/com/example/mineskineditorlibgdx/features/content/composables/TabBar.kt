@@ -25,17 +25,19 @@ import com.example.mineskineditorlibgdx.model.ContentTabType
 @Composable
 fun TabBar(
     modifier: Modifier = Modifier,
+    selectedTabType: ContentTabType,
+    onTabSelected: (ContentTabType) -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        ContentTabType.values().forEachIndexed { index, type ->
+        ContentTabType.values().forEach { type ->
             TabButton(
                 modifier = Modifier.weight(1f),
                 type = type,
-                isSelected = index == 0,
-                onClick = {}
+                isSelected = type == selectedTabType,
+                onClick = { onTabSelected(type) }
             )
         }
     }
@@ -49,33 +51,33 @@ private fun TabButton(
     onClick: () -> Unit
 ) {
     val roundedCornerShape = remember { RoundedCornerShape(6.dp) }
-    Column(
+    Box(
         modifier = modifier
+            .height(70.dp)
             .background(color = Color.White, shape = roundedCornerShape)
             .clip(roundedCornerShape)
             .clickable(onClick = onClick)
-            .padding(4.dp)
+            .padding(6.dp),
     ) {
         Image(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(32.dp).align(Alignment.TopCenter),
             painter = painterResource(type.imageId),
             contentDescription = null,
             contentScale = ContentScale.FillWidth
         )
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = stringResource(type.textId),
-                color = Color.Black,
-                style = MaterialTheme.typography.h2.copy(fontSize = 12.sp, lineHeight = 20.sp)
+        Text(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            text = stringResource(type.textId),
+            color = Color.Black,
+            style = MaterialTheme.typography.h2.copy(fontSize = 12.sp, lineHeight = 20.sp)
+        )
+        if (isSelected) {
+            Icon(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                painter = painterResource(R.drawable.ic_check),
+                tint = Color.Black,
+                contentDescription = null
             )
-            if (isSelected) {
-                Icon(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    painter = painterResource(R.drawable.ic_selected),
-                    contentDescription = null
-                )
-            }
         }
     }
 }

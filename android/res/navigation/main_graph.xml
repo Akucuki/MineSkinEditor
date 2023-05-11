@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_graph">
+    android:id="@+id/main_graph"
+    app:startDestination="@id/fragmentHome">
 
     <fragment
         android:id="@+id/fragmentHome"
@@ -12,5 +13,9 @@
         android:id="@+id/fragmentSkinEditor"
         android:name="com.example.mineskineditorlibgdx.features.libgdx.features.SkinEditor3DFragment">
     </fragment>
+
+    <fragment
+        android:id="@+id/fragmentContent"
+        android:name="com.example.mineskineditorlibgdx.features.content.ContentFragment"/>
 
 </navigation>
