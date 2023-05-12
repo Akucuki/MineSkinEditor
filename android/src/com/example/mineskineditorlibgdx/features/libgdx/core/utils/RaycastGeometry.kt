@@ -1,6 +1,10 @@
 package com.example.mineskineditorlibgdx.features.libgdx.core.utils
 
-import com.badlogic.gdx.math.*
+import com.badlogic.gdx.math.GeometryUtils
+import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Plane
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.Ray
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
