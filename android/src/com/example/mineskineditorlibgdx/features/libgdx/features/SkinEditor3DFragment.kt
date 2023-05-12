@@ -7,7 +7,10 @@ import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,7 +33,11 @@ import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.composables.TopAppBar
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.*
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.ColorPickerDialog
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameBar
+import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameChooserDialog
 import com.example.mineskineditorlibgdx.model.UiString
 import com.example.mineskineditorlibgdx.model.toColorEntries
 import dagger.hilt.android.AndroidEntryPoint

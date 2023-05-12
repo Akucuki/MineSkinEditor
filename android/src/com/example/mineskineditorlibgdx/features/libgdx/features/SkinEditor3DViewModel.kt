@@ -5,16 +5,31 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mineskineditorlibgdx.R
-import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.*
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.BrushTool
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.EraserTool
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.FillTool
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.NoiseTool
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PencilTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
-import com.example.mineskineditorlibgdx.model.*
+import com.example.mineskineditorlibgdx.model.AdditionalOptionsType
+import com.example.mineskineditorlibgdx.model.ColorEntry
+import com.example.mineskineditorlibgdx.model.EditorToolThickness
+import com.example.mineskineditorlibgdx.model.EditorToolType
+import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
+import com.example.mineskineditorlibgdx.model.UiString
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import com.example.mineskineditorlibgdx.utils.toLibGDXColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.LinkedList
 import javax.inject.Inject
 
 private const val RECENT_COLORS_COUNT = 5
