@@ -45,7 +45,7 @@ class AccessTokenAuthenticator(
     ): String? {
         val refreshToken = dataStoreHandler.getRefreshToken() ?: return null
         val response = tryOrNull {
-            dropboxService.get().refreshToken(
+            dropboxService.get().accessToken(
                 refreshToken = refreshToken,
                 clientId = clientId,
                 clientSecret = clientSecret
