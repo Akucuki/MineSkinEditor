@@ -16,25 +16,35 @@ class DataStoreHandler @Inject constructor(@ApplicationContext context: Context)
 
     private val dataStore = context.getDataStore
 
-    suspend fun setTokens(accessToken: String, refreshToken: String) {
+//    suspend fun setTokens(accessToken: String, refreshToken: String) {
+//        dataStore.edit { preferences ->
+//            preferences[PreferencesKeys.ACCESS_TOKEN] = "Bearer $accessToken"
+//            preferences[PreferencesKeys.REFRESH_TOKEN] = refreshToken
+//        }
+//    }
+//
+//    suspend fun getAccessToken(): String? =
+//        dataStore.data.first()[PreferencesKeys.ACCESS_TOKEN]
+//
+//    suspend fun getRefreshToken(): String? =
+//        dataStore.data.first()[PreferencesKeys.REFRESH_TOKEN]
+
+    suspend fun setDbxCredential(dbxCredential: String) {
         dataStore.edit { preferences ->
-            preferences[PreferencesKeys.ACCESS_TOKEN] = "Bearer $accessToken"
-            preferences[PreferencesKeys.REFRESH_TOKEN] = refreshToken
+            preferences[PreferencesKeys.DBX_CREDENTIAL] = dbxCredential
         }
     }
 
-    suspend fun getAccessToken(): String? =
-        dataStore.data.first()[PreferencesKeys.ACCESS_TOKEN]
-
-    suspend fun getRefreshToken(): String? =
-        dataStore.data.first()[PreferencesKeys.REFRESH_TOKEN]
+    suspend fun getDbxCredential(): String? =
+        dataStore.data.first()[PreferencesKeys.DBX_CREDENTIAL]
 
     suspend fun clearData() {
         dataStore.edit { preferences -> preferences.clear() }
     }
 
     private object PreferencesKeys {
-        val ACCESS_TOKEN = stringPreferencesKey("accessToken")
-        val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
+//        val ACCESS_TOKEN = stringPreferencesKey("accessToken")
+//        val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
+        val DBX_CREDENTIAL = stringPreferencesKey("dbxCredential")
     }
 }

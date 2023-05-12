@@ -83,6 +83,9 @@ dependencies {
     // Color picker
     implementation 'com.godaddy.android.colorpicker:compose-color-picker:0.7.0'
 
+    // Dropbox
+    implementation 'com.dropbox.core:dropbox-core-sdk:5.4.4'
+
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'

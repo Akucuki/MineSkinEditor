@@ -6,16 +6,21 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.dropbox.core.v2.DbxClientV2
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.GrayColor
 import com.example.mineskineditorlibgdx.databinding.ActivityMainBinding
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileOutputStream
+import java.io.OutputStream
 import javax.inject.Inject
 
 typealias onDestinationChanged = NavController.OnDestinationChangedListener
@@ -33,6 +38,9 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
     @Inject
     lateinit var navigationDispatcher: NavigationDispatcher
 
+    @Inject
+    lateinit var dbxClient: DbxClientV2
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -42,11 +50,27 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.nav_create -> {
-                        navigationDispatcher.emit { it.navigate(R.id.fragmentSkinEditor) }
+                        navigationDispatcher.emit {
+                            it.navigate(
+                                resId = R.id.fragmentSkinEditor,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(R.id.main_graph, true)
+                                    .build(),
+                                args = null
+                            )
+                        }
                         true
                     }
                     R.id.nav_content -> {
-                        navigationDispatcher.emit { it.navigate(R.id.fragmentContent) }
+                        navigationDispatcher.emit {
+                            it.navigate(
+                                R.id.fragmentContent,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(R.id.main_graph, true)
+                                    .build(),
+                                args = null
+                            )
+                        }
                         true
                     }
                     else -> false
@@ -59,6 +83,18 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         lifecycleScope.apply {
             launch {
                 withContext(Dispatchers.IO) {
+                    try {
+                        val result =
+                            dbxClient.files().listFolderBuilder("/maps, addons, skins")
+                                .withLimit(100).start()
+                        val downloader = dbxClient.files().download("/maps, addons, skins/content.json")
+                        downloader.download(FileOutputStream("/fds.json"))
+                        result.entries.forEach {
+                            println(it.name)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                     val startDestination = provideStartDestination()
                     withContext(Dispatchers.Main) {
                         initNavigation(startDestination)
