@@ -16,11 +16,9 @@ import com.example.mineskineditorlibgdx.databinding.ActivityMainBinding
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.FileOutputStream
-import java.io.OutputStream
 import javax.inject.Inject
 
 typealias onDestinationChanged = NavController.OnDestinationChangedListener

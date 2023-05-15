@@ -9,6 +9,7 @@
     </string>
 
     <string name="cache_dir_name">content_cache</string>
+    <string name="dropbox_caching_track_file_path">/maps, addons, skins/content.json</string>
     <!-- strings -->
     <string name="skin_editor">Skin Editor</string>
     <string name="pencil">Pencil</string>

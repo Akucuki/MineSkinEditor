@@ -2,16 +2,13 @@ package com.example.mineskineditorlibgdx.application.injection
 
 import android.content.Context
 import com.dropbox.core.DbxRequestConfig
-import com.dropbox.core.http.OkHttp3Requestor
 import com.dropbox.core.oauth.DbxCredential
 import com.dropbox.core.v2.DbxClientV2
 import com.example.mineskineditorlibgdx.BuildConfig
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.network.DropboxService
 import com.example.mineskineditorlibgdx.persistence.DataStoreHandler
-import com.example.mineskineditorlibgdx.utils.CACHE_MAX_STALE_DAYS
 import com.example.mineskineditorlibgdx.utils.MAX_CACHE_SIZE
-import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
-import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -45,13 +41,13 @@ object NetworkModule {
         val cachingInterceptor = Interceptor { chain ->
             return@Interceptor chain.proceed(
                 chain.request().newBuilder()
-                    .removeHeader("Cache-Control")
-                    .addHeader("Cache-Control", "public, max-age=360000")
-                    .cacheControl(
-                        CacheControl.Builder()
-                            .maxStale(CACHE_MAX_STALE_DAYS, TimeUnit.DAYS)
-                            .build()
-                    )
+//                    .removeHeader("Cache-Control")
+//                    .addHeader("Cache-Control", "public, max-age=360000")
+//                    .cacheControl(
+//                        CacheControl.Builder()
+//                            .maxStale(CACHE_MAX_STALE_DAYS, TimeUnit.DAYS)
+//                            .build()
+//                    )
 //                    .header(
 //                        "Authorization",
 //                        runBlocking { dataStoreHandler.getAccessToken() ?: "" }
@@ -123,14 +119,15 @@ object NetworkModule {
                 DbxCredential(
                     accessTokenResponse.accessToken,
                     accessTokenResponse.expiresIn,
-                    appSecret,
-                            appKey
+                    refreshToken,
+                    appKey,
+                    appSecret
                 )
             }
             dataStoreHandler.setDbxCredential(credential.toString())
             val requestConfig = DbxRequestConfig.newBuilder(context.getString(R.string.app_name))
                 .withAutoRetryEnabled()
-                .withHttpRequestor(OkHttp3Requestor(okHttpClient))
+//                .withHttpRequestor(OkHttp3Requestor(okHttpClient))
                 .build()
             DbxClientV2(requestConfig, credential)
         }

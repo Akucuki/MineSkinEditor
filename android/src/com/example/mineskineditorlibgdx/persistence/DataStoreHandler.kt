@@ -38,6 +38,15 @@ class DataStoreHandler @Inject constructor(@ApplicationContext context: Context)
     suspend fun getDbxCredential(): String? =
         dataStore.data.first()[PreferencesKeys.DBX_CREDENTIAL]
 
+    suspend fun setDbxCachingTrackFileHash(dbxCachingTrackFileHash: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.DBX_CACHING_TRACK_FILE_HASH] = dbxCachingTrackFileHash
+        }
+    }
+
+    suspend fun getDbxCachingTrackFileHash(): String? =
+        dataStore.data.first()[PreferencesKeys.DBX_CACHING_TRACK_FILE_HASH]
+
     suspend fun clearData() {
         dataStore.edit { preferences -> preferences.clear() }
     }
@@ -46,5 +55,6 @@ class DataStoreHandler @Inject constructor(@ApplicationContext context: Context)
 //        val ACCESS_TOKEN = stringPreferencesKey("accessToken")
 //        val REFRESH_TOKEN = stringPreferencesKey("refreshToken")
         val DBX_CREDENTIAL = stringPreferencesKey("dbxCredential")
+        val DBX_CACHING_TRACK_FILE_HASH = stringPreferencesKey("dbxCachingTrackFileHash")
     }
 }
