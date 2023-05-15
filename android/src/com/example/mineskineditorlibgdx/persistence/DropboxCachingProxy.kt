@@ -15,7 +15,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class DropboxCachingProxy @Inject constructor(
     // TODO probably get rid of it
     private val context: Context,
@@ -40,7 +42,8 @@ class DropboxCachingProxy @Inject constructor(
     suspend fun getFilesDetailsChunk(
         path: String,
         cursor: String? = null,
-        limit: Int = 10
+        // TODO probably redundant
+        limit: Long = 10
     ): FilesDetailsChunk {
         val file = File(cacheDir, path)
         if (file.exists() && file.isDirectory) {
@@ -52,7 +55,7 @@ class DropboxCachingProxy @Inject constructor(
         }
         return withContext(Dispatchers.IO) {
             val result = if (cursor == null) {
-                dbxClientV2.files().listFolder(path)
+                dbxClientV2.files().listFolderBuilder(path).withLimit(limit).start()
             } else {
                 dbxClientV2.files().listFolderContinue(cursor)
             }

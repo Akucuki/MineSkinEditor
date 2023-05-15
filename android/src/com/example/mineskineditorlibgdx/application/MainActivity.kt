@@ -81,12 +81,11 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         lifecycleScope.apply {
             launch {
                 withContext(Dispatchers.IO) {
+                    // TODO remove
                     try {
                         val result =
                             dbxClient.files().listFolderBuilder("/maps, addons, skins")
                                 .withLimit(100).start()
-                        val downloader = dbxClient.files().download("/maps, addons, skins/content.json")
-                        downloader.download(FileOutputStream("/fds.json"))
                         result.entries.forEach {
                             println(it.name)
                         }
