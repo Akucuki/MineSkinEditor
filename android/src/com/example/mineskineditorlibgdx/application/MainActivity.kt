@@ -18,7 +18,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.FileOutputStream
 import javax.inject.Inject
 
 typealias onDestinationChanged = NavController.OnDestinationChangedListener
@@ -83,12 +82,16 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
                 withContext(Dispatchers.IO) {
                     // TODO remove
                     try {
-                        val result =
-                            dbxClient.files().listFolderBuilder("/maps, addons, skins")
-                                .withLimit(100).start()
-                        result.entries.forEach {
-                            println(it.name)
-                        }
+//                        val result =
+//                            dbxClient.files().listFolderBuilder("/maps, addons, skins")
+//                                .withLimit(100).start()
+//                        result.entries.forEach {
+//                            println(it.name)
+//                        }
+//                        this@MainActivity.openFileOutput("test.txt", MODE_PRIVATE).use {
+//                            it.write("context test".toByteArray())
+//                            it.fd.sync()
+//                        }
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -102,7 +105,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentHome
+    private fun provideStartDestination(): Int = R.id.fragmentContent
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->
