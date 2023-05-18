@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -69,6 +71,9 @@ class ContentFragment : Fragment() {
                                 selectedTabType = selectedTabType,
                                 onTabSelected = viewModel::onTabSelected
                             )
+                            LazyVerticalGrid(columns = GridCells.Fixed(count = 2)) {
+
+                            }
                         }
                     }
                 }

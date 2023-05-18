@@ -6,8 +6,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
+import com.dropbox.core.v2.DbxClientV2
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.GrayColor
 import com.example.mineskineditorlibgdx.databinding.ActivityMainBinding
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
     @Inject
     lateinit var navigationDispatcher: NavigationDispatcher
 
+    @Inject
+    lateinit var dbxClient: DbxClientV2
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -42,11 +47,27 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
             setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.nav_create -> {
-                        navigationDispatcher.emit { it.navigate(R.id.fragmentSkinEditor) }
+                        navigationDispatcher.emit {
+                            it.navigate(
+                                resId = R.id.fragmentSkinEditor,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(R.id.main_graph, true)
+                                    .build(),
+                                args = null
+                            )
+                        }
                         true
                     }
                     R.id.nav_content -> {
-                        navigationDispatcher.emit { it.navigate(R.id.fragmentContent) }
+                        navigationDispatcher.emit {
+                            it.navigate(
+                                R.id.fragmentContent,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(R.id.main_graph, true)
+                                    .build(),
+                                args = null
+                            )
+                        }
                         true
                     }
                     else -> false
@@ -59,6 +80,21 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         lifecycleScope.apply {
             launch {
                 withContext(Dispatchers.IO) {
+                    // TODO remove
+                    try {
+//                        val result =
+//                            dbxClient.files().listFolderBuilder("/maps, addons, skins")
+//                                .withLimit(100).start()
+//                        result.entries.forEach {
+//                            println(it.name)
+//                        }
+//                        this@MainActivity.openFileOutput("test.txt", MODE_PRIVATE).use {
+//                            it.write("context test".toByteArray())
+//                            it.fd.sync()
+//                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                     val startDestination = provideStartDestination()
                     withContext(Dispatchers.Main) {
                         initNavigation(startDestination)
@@ -69,7 +105,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentHome
+    private fun provideStartDestination(): Int = R.id.fragmentContent
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->

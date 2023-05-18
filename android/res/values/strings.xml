@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MineSkinEditorLibgdx</string>
-    <!-- keys -->
+    <!-- variables -->
     <string name="dropbox_app_key">6joanrs1pbsceqt</string>
     <string name="dropbox_app_secret">s5kqqi05m2u9gk0</string>
     <string name="dropbox_refresh_token">
         -zcLodaEL0oAAAAAAAAAAS8BN6zJfxFn7AZ10enhRiOIV6vDX4JQfSLN5bIf1F5H
     </string>
+
+    <string name="cache_dir_name">content_cache</string>
+    <string name="dropbox_caching_track_file_path">/maps, addons, skins/content.json</string>
     <!-- strings -->
     <string name="skin_editor">Skin Editor</string>
     <string name="pencil">Pencil</string>
