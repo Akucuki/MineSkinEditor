@@ -37,7 +37,7 @@ class ContentViewModel @Inject constructor(
         items.toString()
         viewModelScope.launch(Dispatchers.IO) {
 //            dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins/content.json")
-            dropboxCachingProxy.getFile("/maps, addons, skins/content_with_placeholders.json")
+            dropboxCachingProxy.getFile("/maps, addons, skins/content.json")
 //            val filesDetailsChunk = dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins")
 //            Log.d("vitalik", "FilesDetailsChunk: $filesDetailsChunk")
         }
