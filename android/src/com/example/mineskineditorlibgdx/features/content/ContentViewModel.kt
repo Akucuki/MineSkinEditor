@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mineskineditorlibgdx.model.ContentTabType
-import com.example.mineskineditorlibgdx.persistence.DropboxCachingProxy
+import com.example.mineskineditorlibgdx.persistence.dropboxCaching.DropboxCachingProxy
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,9 +37,9 @@ class ContentViewModel @Inject constructor(
         items.toString()
         viewModelScope.launch(Dispatchers.IO) {
 //            dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins/content.json")
-//            dropboxCachingProxy.getFile("/maps, addons, skins/content.json")
-            val filesDetailsChunk = dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins")
-            Log.d("vitalik", "FilesDetailsChunk: $filesDetailsChunk")
+            dropboxCachingProxy.getFile("/maps, addons, skins/content.json")
+//            val filesDetailsChunk = dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins")
+//            Log.d("vitalik", "FilesDetailsChunk: $filesDetailsChunk")
         }
     }
 
