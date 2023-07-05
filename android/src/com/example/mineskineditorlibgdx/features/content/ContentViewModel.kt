@@ -1,14 +1,20 @@
 package com.example.mineskineditorlibgdx.features.content
 
 import android.util.Log
+import androidx.core.net.toFile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mineskineditorlibgdx.model.ContentTabType
+import com.example.mineskineditorlibgdx.model.local.ContentItemDataUi
+import com.example.mineskineditorlibgdx.model.local.ContentType
+import com.example.mineskineditorlibgdx.model.mapping.toContentData
+import com.example.mineskineditorlibgdx.model.remote.content.RemoteContentData
 import com.example.mineskineditorlibgdx.persistence.dropboxCaching.DropboxCachingProxy
 import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,31 +25,48 @@ private const val CONTENT_ITEMS = "content_items"
 class ContentViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val navigationDispatcher: NavigationDispatcher,
-    private val dropboxCachingProxy: DropboxCachingProxy
+    private val dropboxCachingProxy: DropboxCachingProxy,
+    private val gson: Gson
 ) : ViewModel() {
 
-    val items = handle.getStateFlow(
+    val isLoading = MutableStateFlow(false)
+    val isLoadingError = MutableStateFlow(false)
+    val contentItems = handle.getStateFlow(
         CONTENT_ITEMS,
-        emptyList<String>()
+        emptyList<ContentItemDataUi>()
     )
 
     val selectedTab = handle.getStateFlow(
         SELECTED_CONTENT_TYPE,
-        ContentTabType.SKINS
+        ContentType.SKINS
     )
 
     init {
-        // TODO remove
-        items.toString()
+        loadContentItemsForType()
+    }
+
+    fun loadContentItemsForType() {
         viewModelScope.launch(Dispatchers.IO) {
-//            dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins/content.json")
-            dropboxCachingProxy.getFile("/maps, addons, skins/content.json")
-//            val filesDetailsChunk = dropboxCachingProxy.getFilesDetailsChunk("/maps, addons, skins")
-//            Log.d("vitalik", "FilesDetailsChunk: $filesDetailsChunk")
+            val contentCatalogFileUri = dropboxCachingProxy.getFile("/maps, addons, skins/content_with_placeholders.json")
+            if (contentCatalogFileUri == null) {
+                isLoadingError.value = true
+                return@launch
+            }
+            val contentCatalogFile = contentCatalogFileUri.toFile()
+            contentCatalogFile.inputStream().use { inputStream ->
+                val remoteContentData = gson.fromJson(inputStream.reader(), RemoteContentData::class.java)
+                val contentData = remoteContentData.toContentData()
+                handle[CONTENT_ITEMS] = when (selectedTab.value) {
+                    ContentType.SKINS -> contentData.skins
+                    ContentType.MAPS -> contentData.maps
+                    ContentType.ADDONS -> contentData.addons
+                }
+                Log.d("vitalik", "Content items: ${contentItems.value}")
+            }
         }
     }
 
-    fun onTabSelected(type: ContentTabType) {
+    fun onTabSelected(type: ContentType) {
         handle[SELECTED_CONTENT_TYPE] = type
 
         // TODO remove

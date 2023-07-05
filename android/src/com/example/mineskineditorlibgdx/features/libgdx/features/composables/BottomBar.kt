@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.mineskineditorlibgdx.application.theme.GrayColor
 import com.example.mineskineditorlibgdx.application.theme.YellowColor
-import com.example.mineskineditorlibgdx.model.EditorToolType
+import com.example.mineskineditorlibgdx.model.local.EditorToolType
 
 @Composable
 fun BottomBar(

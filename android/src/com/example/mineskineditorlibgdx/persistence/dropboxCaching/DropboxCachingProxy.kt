@@ -22,6 +22,7 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// TODO remove, should be used.
 @Suppress("unused")
 @Singleton
 class DropboxCachingProxy @Inject constructor(
@@ -35,7 +36,6 @@ class DropboxCachingProxy @Inject constructor(
     private val job = Job()
     private val scope = CoroutineScope(Dispatchers.IO + job)
     private var trackingFileInspectionJob: Job? = null
-    private var indexingJob: Job? = null
     private val cacheDir = File(context.filesDir, context.getString(R.string.cache_dir_name))
 
     //TODO indexing job

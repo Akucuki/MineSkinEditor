@@ -10,6 +10,11 @@
 
     <string name="cache_dir_name">content_cache</string>
     <string name="dropbox_caching_track_file_path">/maps, addons, skins/content.json</string>
+
+    <!-- TODO check if needed -->
+<!--    <string name="dropbox_skin_container_object_name">6y37wmxowk</string>-->
+<!--    <string name="dropbox_map_container_object_name">8m5sz</string>-->
+<!--    <string name="dropbox_addon_container_object_name">8m5sz</string>-->
     <!-- strings -->
     <string name="skin_editor">Skin Editor</string>
     <string name="pencil">Pencil</string>

@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.model
+package com.example.mineskineditorlibgdx.model.local
 
 import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
