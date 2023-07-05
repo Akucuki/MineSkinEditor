@@ -38,8 +38,8 @@ import com.example.mineskineditorlibgdx.features.libgdx.features.composables.Col
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameBar
 import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameChooserDialog
-import com.example.mineskineditorlibgdx.model.UiString
-import com.example.mineskineditorlibgdx.model.toColorEntries
+import com.example.mineskineditorlibgdx.model.local.UiString
+import com.example.mineskineditorlibgdx.model.local.toColorEntries
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.receiveAsFlow
 

@@ -27,6 +27,7 @@ import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.composables.TopAppBar
 import com.example.mineskineditorlibgdx.features.content.composables.TabBar
+import com.example.mineskineditorlibgdx.utils.APP_BAR_HEIGHT
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,7 +64,7 @@ class ContentFragment : Fragment() {
                             modifier = Modifier
                                 .fillMaxSize()
                                 .statusBarsPadding()
-                                .padding(top = 48.dp)
+                                .padding(top = APP_BAR_HEIGHT.dp + 16.dp)
                                 .padding(horizontal = 10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {

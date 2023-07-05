@@ -4,7 +4,7 @@ import androidx.annotation.FloatRange
 import com.badlogic.gdx.graphics.Color
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.OnTextureColorPickListener
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
-import com.example.mineskineditorlibgdx.model.UiString
+import com.example.mineskineditorlibgdx.model.local.UiString
 
 
 sealed class SkinEditor3DEvent {

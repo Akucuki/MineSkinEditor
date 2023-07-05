@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.dp
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.OrangeColor
 import com.example.mineskineditorlibgdx.application.theme.PurpleColor
-import com.example.mineskineditorlibgdx.model.AdditionalOptionsType
-import com.example.mineskineditorlibgdx.model.ColorEntry
-import com.example.mineskineditorlibgdx.model.EditorToolThickness
+import com.example.mineskineditorlibgdx.model.local.AdditionalOptionsType
+import com.example.mineskineditorlibgdx.model.local.ColorEntry
+import com.example.mineskineditorlibgdx.model.local.EditorToolThickness
 
 @Composable
 fun RecentColorsBar(

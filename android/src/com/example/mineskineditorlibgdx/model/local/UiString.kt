@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.model
+package com.example.mineskineditorlibgdx.model.local
 
 import android.content.Context
 import android.os.Parcelable

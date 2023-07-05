@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -26,19 +27,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mineskineditorlibgdx.R
-import com.example.mineskineditorlibgdx.model.ContentTabType
+import com.example.mineskineditorlibgdx.model.local.ContentType
 
 @Composable
 fun TabBar(
     modifier: Modifier = Modifier,
-    selectedTabType: ContentTabType,
-    onTabSelected: (ContentTabType) -> Unit
+    selectedTabType: ContentType,
+    onTabSelected: (ContentType) -> Unit
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        ContentTabType.values().forEach { type ->
+        ContentType.values().forEach { type ->
             TabButton(
                 modifier = Modifier.weight(1f),
                 type = type,
@@ -52,7 +53,7 @@ fun TabBar(
 @Composable
 private fun TabButton(
     modifier: Modifier = Modifier,
-    type: ContentTabType,
+    type: ContentType,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
@@ -66,7 +67,9 @@ private fun TabButton(
             .padding(6.dp),
     ) {
         Image(
-            modifier = Modifier.size(32.dp).align(Alignment.TopCenter),
+            modifier = Modifier
+                .size(32.dp)
+                .align(Alignment.TopCenter),
             painter = painterResource(type.imageId),
             contentDescription = null,
             contentScale = ContentScale.FillWidth
@@ -79,9 +82,13 @@ private fun TabButton(
         )
         if (isSelected) {
             Icon(
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .background(color = Color.Black, shape = CircleShape)
+                    .padding(2.dp)
+                    .size(16.dp),
                 painter = painterResource(R.drawable.ic_check),
-                tint = Color.Black,
+                tint = Color.White,
                 contentDescription = null
             )
         }

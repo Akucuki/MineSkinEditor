@@ -1,14 +1,14 @@
-package com.example.mineskineditorlibgdx.model
+package com.example.mineskineditorlibgdx.model.local
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.example.mineskineditorlibgdx.R
 
-enum class ContentTabType(
+enum class ContentType(
     @StringRes
     val textId: Int,
     @DrawableRes
-    val imageId: Int
+    val imageId: Int,
 ) {
     SKINS(R.string.skins, R.drawable.img_skins),
     ADDONS(R.string.addons, R.drawable.img_addons),
