@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.features
+package com.example.mineskineditorlibgdx.features.libgdx.features.skinEditor3D
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
@@ -32,10 +32,10 @@ import kotlinx.coroutines.launch
 import java.util.LinkedList
 import javax.inject.Inject
 
-private const val RECENT_COLORS_COUNT = 5
+const val RECENT_COLORS_COUNT = 5
 private const val SKIN_IMAGE_EXTENSION_SUFFIX = ".png"
 
-private val initialColors = Array(RECENT_COLORS_COUNT) {
+val initialColors = Array(RECENT_COLORS_COUNT) {
     ColorEntry(color = Color.White).toParcelableColorEntry()
 }
 

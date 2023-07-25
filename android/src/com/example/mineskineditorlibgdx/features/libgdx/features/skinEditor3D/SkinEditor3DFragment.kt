@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.features
+package com.example.mineskineditorlibgdx.features.libgdx.features.skinEditor3D
 
 import android.graphics.Color
 import android.graphics.PixelFormat
@@ -31,13 +31,13 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.composables.TopAppBar
+import com.example.mineskineditorlibgdx.features.composables.skinEditor.BottomBar
+import com.example.mineskineditorlibgdx.features.composables.skinEditor.ColorPickerDialog
+import com.example.mineskineditorlibgdx.features.composables.skinEditor.RecentColorsBar
+import com.example.mineskineditorlibgdx.features.composables.skinEditor.SkinNameBar
+import com.example.mineskineditorlibgdx.features.composables.skinEditor.SkinNameChooserDialog
 import com.example.mineskineditorlibgdx.features.libgdx.core.game.ModelViewerGame
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.SkinEditor3D
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.BottomBar
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.ColorPickerDialog
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.RecentColorsBar
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameBar
-import com.example.mineskineditorlibgdx.features.libgdx.features.composables.SkinNameChooserDialog
 import com.example.mineskineditorlibgdx.model.UiString
 import com.example.mineskineditorlibgdx.model.toColorEntries
 import dagger.hilt.android.AndroidEntryPoint

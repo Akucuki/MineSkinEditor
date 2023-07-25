@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
                     R.id.nav_create -> {
                         navigationDispatcher.emit {
                             it.navigate(
-                                resId = R.id.fragmentSkinEditor,
+                                resId = R.id.fragmentSkinEditor3D,
                                 navOptions = NavOptions.Builder()
                                     .setPopUpTo(R.id.main_graph, true)
                                     .build(),
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentContent
+    private fun provideStartDestination(): Int = R.id.fragmentSkinEditor2D // replace with the correct one when ready
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->

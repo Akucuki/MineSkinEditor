@@ -2,7 +2,6 @@ package com.example.mineskineditorlibgdx.persistence.dropboxCaching.model
 
 import androidx.room.Embedded
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 

@@ -1,10 +1,4 @@
 package com.example.mineskineditorlibgdx.model.remote
-import android.os.Parcelable
-
-import com.squareup.moshi.JsonClass
-
-import com.squareup.moshi.Json
-import kotlinx.android.parcel.Parcelize
 
 
 //@JsonClass(generateAdapter = true)

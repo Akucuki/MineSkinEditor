@@ -10,12 +10,22 @@
     </fragment>
 
     <fragment
-        android:id="@+id/fragmentSkinEditor"
-        android:name="com.example.mineskineditorlibgdx.features.libgdx.features.SkinEditor3DFragment">
+        android:id="@+id/fragmentSkinEditor3D"
+        android:name="com.example.mineskineditorlibgdx.features.libgdx.features.skinEditor3D.SkinEditor3DFragment">
     </fragment>
 
     <fragment
         android:id="@+id/fragmentContent"
         android:name="com.example.mineskineditorlibgdx.features.content.ContentFragment"/>
+
+    <fragment
+        android:id="@+id/fragmentSkinEditor2D"
+        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.editor.SkinEditor2DFragment">
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentBodyPartChooser"
+        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.BodyPartChooserFragment">
+    </fragment>
 
 </navigation>

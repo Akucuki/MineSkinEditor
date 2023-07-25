@@ -9,8 +9,8 @@ import com.dropbox.core.v2.files.FolderMetadata
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.persistence.DataStoreHandler
 import com.example.mineskineditorlibgdx.persistence.dropboxCaching.db.CachingInfoDao
-import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FolderInfo
 import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FileInfo
+import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FolderInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
