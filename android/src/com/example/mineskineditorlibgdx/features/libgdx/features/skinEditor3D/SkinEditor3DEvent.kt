@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.features
+package com.example.mineskineditorlibgdx.features.libgdx.features.skinEditor3D
 
 import androidx.annotation.FloatRange
 import com.badlogic.gdx.graphics.Color

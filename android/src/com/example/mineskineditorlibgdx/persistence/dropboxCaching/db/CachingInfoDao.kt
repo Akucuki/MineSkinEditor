@@ -6,9 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FileInfo
 import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FolderInfo
 import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FolderInfoWithFiles
-import com.example.mineskineditorlibgdx.persistence.dropboxCaching.model.FileInfo
 
 @Dao
 interface CachingInfoDao {

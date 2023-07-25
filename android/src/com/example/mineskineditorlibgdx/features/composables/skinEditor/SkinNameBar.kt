@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.features.composables
+package com.example.mineskineditorlibgdx.features.composables.skinEditor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

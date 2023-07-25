@@ -1,4 +1,4 @@
-package com.example.mineskineditorlibgdx.features.libgdx.features.composables
+package com.example.mineskineditorlibgdx.features.composables.skinEditor
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
