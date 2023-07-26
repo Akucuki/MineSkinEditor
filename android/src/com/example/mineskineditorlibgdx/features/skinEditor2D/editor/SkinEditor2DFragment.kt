@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -44,7 +44,7 @@ class SkinEditor2DFragment : Fragment() {
                     painter = painterResource(R.drawable.bg_main),
                     contentScale = ContentScale.FillBounds
                 )
-                Column(
+                Box(
                     modifier = Modifier.fillMaxSize().statusBarsPadding()
                 ) {
                     SkinCanvas(
