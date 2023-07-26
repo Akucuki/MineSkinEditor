@@ -3,6 +3,7 @@ package com.example.mineskineditorlibgdx.features.skinEditor2D.editor.composable
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +16,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -75,6 +78,18 @@ fun SkinCanvas(
                 translationX = offset.x
                 translationY = offset.y
             }
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    val x = it.x
+                    val y = it.y
+                    val cellSize = (canvasSize.width - gridStrokeThicknessPx) / mutableBitmap.width
+                    val pixelX = (x / cellSize).toInt()
+                    val pixelY = (y / cellSize).toInt()
+                    mutableBitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true).apply {
+                        setPixel(pixelX, pixelY, Color.Red.toArgb())
+                    }
+                }
+            }
             .twoFingerTransformable(transformableState)
     ) {
         canvasSize = size
@@ -86,24 +101,36 @@ fun SkinCanvas(
 //        )
         val gridStrokesCount = mutableBitmap.width + 1
         val cellSize = (size.width - gridStrokesCount * gridStrokeThicknessPx) / mutableBitmap.width
-        for (horizontalPixelIndex in 0 until mutableBitmap.width) {
-            for (verticalPixelIndex in 0 until mutableBitmap.height) {
-                val pixelColor = mutableBitmap.getPixel(horizontalPixelIndex, verticalPixelIndex)
-                drawRect(
-                    color = Color(pixelColor),
-                    topLeft = Offset(
-                        x = horizontalPixelIndex * cellSize + horizontalPixelIndex * gridStrokeThicknessPx + gridStrokeThicknessPx,
-                        y = verticalPixelIndex * cellSize + verticalPixelIndex * gridStrokeThicknessPx + gridStrokeThicknessPx
-                    ),
-                    size = Size(cellSize, cellSize)
-                )
-            }
-        }
+        drawBitmapPixels(
+            bitmap = mutableBitmap,
+            cellSize = cellSize,
+            spacing = gridStrokeThicknessPx
+        )
 //        drawGrid(
 //            gridStrokesCount = gridStrokesCount,
 //            gridStrokeThicknessPx = gridStrokeThicknessPx,
 //            cellSize = cellSize
 //        )
+    }
+}
+
+private fun DrawScope.drawBitmapPixels(
+    bitmap: Bitmap,
+    cellSize: Float,
+    spacing: Float
+) {
+    for (horizontalPixelIndex in 0 until bitmap.width) {
+        for (verticalPixelIndex in 0 until bitmap.height) {
+            val pixelColor = bitmap.getPixel(horizontalPixelIndex, verticalPixelIndex)
+            drawRect(
+                color = Color(pixelColor),
+                topLeft = Offset(
+                    x = horizontalPixelIndex * cellSize + horizontalPixelIndex * spacing + spacing,
+                    y = verticalPixelIndex * cellSize + verticalPixelIndex * spacing + spacing
+                ),
+                size = Size(cellSize, cellSize)
+            )
+        }
     }
 }
 
