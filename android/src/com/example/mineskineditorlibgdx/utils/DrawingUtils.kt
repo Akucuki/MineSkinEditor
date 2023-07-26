@@ -20,6 +20,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -151,4 +152,36 @@ private suspend fun AwaitPointerEventScope.detectZoom(
             }
         }
     } while (!canceled && event.changes.any { it.pressed })
+}
+
+fun calculateLineCoordinates(x0: Int, y0: Int, x1: Int, y1: Int): List<IntOffset> {
+    val pixels = mutableListOf<IntOffset>()
+
+    val dx = abs(x1 - x0)
+    val dy = abs(y1 - y0)
+
+    val sx = if (x0 < x1) 1 else -1
+    val sy = if (y0 < y1) 1 else -1
+
+    var err = (if (dx > dy) dx else -dy) / 2
+    var err2: Int
+
+    var x = x0
+    var y = y0
+    while (true) {
+        pixels.add(IntOffset(x, y))
+
+        if (x == x1 && y == y1) break
+
+        err2 = err
+        if (err2 > -dx) {
+            err -= dy
+            x += sx
+        }
+        if (err2 < dy) {
+            err += dx
+            y += sy
+        }
+    }
+    return pixels
 }

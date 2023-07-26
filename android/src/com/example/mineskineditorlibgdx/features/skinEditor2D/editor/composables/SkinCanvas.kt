@@ -3,8 +3,11 @@ package com.example.mineskineditorlibgdx.features.skinEditor2D.editor.composable
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.mineskineditorlibgdx.utils.calculateLineCoordinates
 import com.example.mineskineditorlibgdx.utils.twoFingerTransformable
 
 // TODO probably needs some tweaking to add ability to draw bigger skins
@@ -29,6 +33,7 @@ fun SkinCanvas(
     modifier: Modifier = Modifier,
     bitmap: Bitmap,
     gridStrokeThickness: Dp = 2.dp,
+    gridStrokeColor: Color,
 
     minScale: Float = .5f,
     maxScale: Float = 3f,
@@ -44,7 +49,11 @@ fun SkinCanvas(
         )
     }
 
+    val aspectRatio = remember(bitmap) { bitmap.width.toFloat() / bitmap.height }
+
     var canvasSize by remember { mutableStateOf(Size.Zero) }
+    val gridStrokesCount = remember { mutableBitmap.width + 1 }
+    var cellSize by remember { mutableStateOf(0f) }
 
     var scale by remember { mutableStateOf(1f) }
 
@@ -70,8 +79,12 @@ fun SkinCanvas(
     val density = LocalDensity.current
     val gridStrokeThicknessPx = with(density) { gridStrokeThickness.toPx() }
 
+    var lastPos: Offset? = remember { null }
+
     Canvas(
         modifier = modifier
+            .fillMaxSize()
+            .aspectRatio(aspectRatio)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -82,35 +95,67 @@ fun SkinCanvas(
                 detectTapGestures {
                     val x = it.x
                     val y = it.y
-                    val cellSize = (canvasSize.width - gridStrokeThicknessPx) / mutableBitmap.width
                     val pixelX = (x / cellSize).toInt()
                     val pixelY = (y / cellSize).toInt()
-                    mutableBitmap = mutableBitmap.copy(Bitmap.Config.ARGB_8888, true).apply {
-                        setPixel(pixelX, pixelY, Color.Red.toArgb())
-                    }
+                    mutableBitmap = mutableBitmap
+                        .copy(Bitmap.Config.ARGB_8888, true)
+                        .apply {
+                            setPixel(pixelX, pixelY, Color.Red.toArgb())
+                        }
                 }
+            }
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = { offset -> lastPos = offset },
+                    onDragEnd = { lastPos = null },
+                    onDragCancel = { lastPos = null },
+                    onDrag = { change, _ ->
+                        val currentX = (change.position.x / cellSize).toInt()
+                        val currentY = (change.position.y / cellSize).toInt()
+                        lastPos?.let { lastOffset ->
+                            val lastX = (lastOffset.x / cellSize).toInt()
+                            val lastY = (lastOffset.y / cellSize).toInt()
+                            val linePixels = calculateLineCoordinates(lastX, lastY, currentX, currentY)
+                            mutableBitmap = mutableBitmap
+                                .copy(Bitmap.Config.ARGB_8888, true)
+                                .apply {
+                                    linePixels.forEach { (x, y) ->
+                                        if (x !in 0 until mutableBitmap.width || y !in 0 until mutableBitmap.height) {
+                                            return@forEach
+                                        }
+                                        setPixel(x, y, Color.Red.toArgb())
+                                    }
+                                }
+                        }
+
+                        lastPos = change.position // update the last position
+                        change.consume()
+                    }
+                )
             }
             .twoFingerTransformable(transformableState)
     ) {
         canvasSize = size
+        cellSize = (canvasSize.width - gridStrokeThicknessPx) / mutableBitmap.width
 
 //        drawRect(
 //            color = Color.Yellow,
 //            topLeft = Offset(0f, 0f),
 //            size = size
 //        )
-        val gridStrokesCount = mutableBitmap.width + 1
-        val cellSize = (size.width - gridStrokesCount * gridStrokeThicknessPx) / mutableBitmap.width
+        val wrappedCellSize =
+            (size.width - gridStrokesCount * gridStrokeThicknessPx) / mutableBitmap.width
         drawBitmapPixels(
             bitmap = mutableBitmap,
-            cellSize = cellSize,
+            cellSize = wrappedCellSize,
             spacing = gridStrokeThicknessPx
         )
-//        drawGrid(
-//            gridStrokesCount = gridStrokesCount,
-//            gridStrokeThicknessPx = gridStrokeThicknessPx,
-//            cellSize = cellSize
-//        )
+        drawGrid(
+            gridStrokesCount = gridStrokesCount,
+            gridStrokeThicknessPx = gridStrokeThicknessPx,
+            cellSize = wrappedCellSize,
+            color = gridStrokeColor
+        )
     }
 }
 
@@ -137,14 +182,16 @@ private fun DrawScope.drawBitmapPixels(
 private fun DrawScope.drawGrid(
     gridStrokesCount: Int,
     gridStrokeThicknessPx: Float,
-    cellSize: Float
+    cellSize: Float,
+    color: Color
 ) {
     Orientation.values().forEach { orientation ->
         drawGridLines(
             orientation = orientation,
             strokesCount = gridStrokesCount,
             strokeThicknessPx = gridStrokeThicknessPx,
-            spacing = cellSize
+            spacing = cellSize,
+            color = color
         )
     }
 }
@@ -153,7 +200,8 @@ private fun DrawScope.drawGridLines(
     orientation: Orientation,
     strokesCount: Int,
     strokeThicknessPx: Float,
-    spacing: Float
+    spacing: Float,
+    color: Color
 ) {
     repeat(strokesCount) { horizontalIndex ->
         val spacedOffset =
@@ -169,7 +217,7 @@ private fun DrawScope.drawGridLines(
         drawLine(
             start = startOffset,
             end = endOffset,
-            color = Color.Black,
+            color = color,
             strokeWidth = strokeThicknessPx
         )
     }
