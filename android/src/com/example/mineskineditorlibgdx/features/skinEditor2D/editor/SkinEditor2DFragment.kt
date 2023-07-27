@@ -5,19 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
@@ -44,12 +44,14 @@ class SkinEditor2DFragment : Fragment() {
                     painter = painterResource(R.drawable.bg_main),
                     contentScale = ContentScale.FillBounds
                 )
-                Column(
-                    modifier = Modifier.fillMaxSize().statusBarsPadding()
+                Box(
+                    modifier = Modifier.fillMaxSize().statusBarsPadding(),
+                    contentAlignment = Alignment.Center
                 ) {
                     SkinCanvas(
-                        modifier = Modifier.size(400.dp),
+                        modifier = Modifier.fillMaxSize(),
                         bitmap = testBitmap!!,
+                        gridStrokeColor = Color.White
                     )
                 }
             }
