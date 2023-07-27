@@ -34,6 +34,10 @@ fun SkinCanvas(
     bitmap: Bitmap,
     gridStrokeThickness: Dp = 2.dp,
     gridStrokeColor: Color,
+    areBackgroundCellsEnabled: Boolean = true,
+    backgroundCellsTimesPerPixel: Int = 3,
+    backgroundCellsPrimaryColor: Color = Color.LightGray,
+    backgroundCellsSecondaryColor: Color = Color.Gray,
 
     minScale: Float = .5f,
     maxScale: Float = 3f,
@@ -115,12 +119,16 @@ fun SkinCanvas(
                         lastPos?.let { lastOffset ->
                             val lastX = (lastOffset.x / cellSize).toInt()
                             val lastY = (lastOffset.y / cellSize).toInt()
-                            val linePixels = calculateLineCoordinates(lastX, lastY, currentX, currentY)
+                            val linePixels =
+                                calculateLineCoordinates(lastX, lastY, currentX, currentY)
                             mutableBitmap = mutableBitmap
                                 .copy(Bitmap.Config.ARGB_8888, true)
                                 .apply {
                                     linePixels.forEach { (x, y) ->
-                                        if (x !in 0 until mutableBitmap.width || y !in 0 until mutableBitmap.height) {
+                                        if (
+                                            x !in 0 until mutableBitmap.width ||
+                                            y !in 0 until mutableBitmap.height
+                                        ) {
                                             return@forEach
                                         }
                                         setPixel(x, y, Color.Red.toArgb())
@@ -138,18 +146,18 @@ fun SkinCanvas(
         canvasSize = size
         cellSize = (canvasSize.width - gridStrokeThicknessPx) / mutableBitmap.width
 
-//        drawRect(
-//            color = Color.Yellow,
-//            topLeft = Offset(0f, 0f),
-//            size = size
-//        )
         val wrappedCellSize =
             (size.width - gridStrokesCount * gridStrokeThicknessPx) / mutableBitmap.width
         drawBitmapPixels(
             bitmap = mutableBitmap,
             cellSize = wrappedCellSize,
-            spacing = gridStrokeThicknessPx
+            spacing = gridStrokeThicknessPx,
+            areBackgroundCellsEnabled = areBackgroundCellsEnabled,
+            backgroundCellsTimesPerPixel = backgroundCellsTimesPerPixel,
+            backgroundCellsPrimaryColor = backgroundCellsPrimaryColor,
+            backgroundCellsSecondaryColor = backgroundCellsSecondaryColor
         )
+
         drawGrid(
             gridStrokesCount = gridStrokesCount,
             gridStrokeThicknessPx = gridStrokeThicknessPx,
@@ -159,13 +167,59 @@ fun SkinCanvas(
     }
 }
 
+private fun DrawScope.drawBackgroundCells(
+    timesPerPixel: Int,
+    horizontalCellIndex: Int,
+    size: Float,
+    spacing: Float,
+    verticalCellIndex: Int,
+    primaryColor: Color,
+    secondaryColor: Color
+) {
+    for (miniHorizontalIndex in 0 until timesPerPixel) {
+        for (miniVerticalIndex in 0 until timesPerPixel) {
+            val topLeft = Offset(
+                x = (horizontalCellIndex * timesPerPixel + miniHorizontalIndex) * size + horizontalCellIndex * spacing + spacing,
+                y = (verticalCellIndex * timesPerPixel + miniVerticalIndex) * size + verticalCellIndex * spacing + spacing
+            )
+
+            val globalXIndex = horizontalCellIndex * timesPerPixel + miniHorizontalIndex
+            val globalYIndex = verticalCellIndex * timesPerPixel + miniVerticalIndex
+            val color = if ((globalXIndex + globalYIndex) % 2 == 0) primaryColor else secondaryColor
+
+            drawRect(
+                color = color,
+                topLeft = topLeft,
+                size = Size(size, size)
+            )
+        }
+    }
+}
+
 private fun DrawScope.drawBitmapPixels(
     bitmap: Bitmap,
     cellSize: Float,
-    spacing: Float
+    spacing: Float,
+    areBackgroundCellsEnabled: Boolean = true,
+    backgroundCellsTimesPerPixel: Int = 3,
+    backgroundCellsPrimaryColor: Color = Color.LightGray,
+    backgroundCellsSecondaryColor: Color = Color.Gray
 ) {
+    val backgroundCellsSize = cellSize / backgroundCellsTimesPerPixel
     for (horizontalPixelIndex in 0 until bitmap.width) {
         for (verticalPixelIndex in 0 until bitmap.height) {
+            if (areBackgroundCellsEnabled) {
+                drawBackgroundCells(
+                    timesPerPixel = backgroundCellsTimesPerPixel,
+                    horizontalCellIndex = horizontalPixelIndex,
+                    size = backgroundCellsSize,
+                    spacing = spacing,
+                    verticalCellIndex = verticalPixelIndex,
+                    primaryColor = backgroundCellsPrimaryColor,
+                    secondaryColor = backgroundCellsSecondaryColor
+                )
+            }
+
             val pixelColor = bitmap.getPixel(horizontalPixelIndex, verticalPixelIndex)
             drawRect(
                 color = Color(pixelColor),
