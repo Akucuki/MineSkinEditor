@@ -28,6 +28,7 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.P
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PencilTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.DebugLevel
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.RaycastGeometry
+import com.example.mineskineditorlibgdx.features.libgdx.core.utils.asPaintCanvas
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.firstMaterialTexture
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.safeConsumePixmap
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.safeDrawLine
@@ -35,6 +36,7 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.utils.safeDrawModel
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.safeDrawModelTriangles
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.safeRender
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.setFirstMaterialTexture
+import com.example.mineskineditorlibgdx.features.libgdx.core.utils.toCompose
 import com.example.mineskineditorlibgdx.features.libgdx.core.utils.triangles
 import com.example.mineskineditorlibgdx.model.ModelTriangle
 
@@ -189,11 +191,11 @@ class ModelViewerGame(
                         paintTool.use(
                             textureX,
                             textureY,
-                            paintColor,
-                            pixmap,
+                            paintColor.toCompose(),
+                            pixmap.asPaintCanvas(),
                             paintThickness,
                             noisePaintStrength,
-                            initialModelTexture!!.textureData.safeConsumePixmap()
+                            initialModelTexture!!.textureData.safeConsumePixmap().asPaintCanvas()
                         )
                         val newTexture = Texture(pixmap)
                         instance?.setFirstMaterialTexture(newTexture)

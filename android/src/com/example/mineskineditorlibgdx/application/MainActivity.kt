@@ -73,7 +73,6 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
                     else -> false
                 }
             }
-
         }
         setContentView(binding.root)
         applyEdgeToEdge()
