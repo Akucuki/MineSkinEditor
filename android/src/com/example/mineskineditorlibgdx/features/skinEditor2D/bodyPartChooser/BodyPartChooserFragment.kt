@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.mineskineditorlibgdx.R
 import com.example.mineskineditorlibgdx.application.theme.MineSkinEditorTheme
 import com.example.mineskineditorlibgdx.features.composables.TopAppBar
@@ -25,6 +26,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class BodyPartChooserFragment : Fragment() {
+
+    private val viewModel: BodyPartChooserViewModel by viewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

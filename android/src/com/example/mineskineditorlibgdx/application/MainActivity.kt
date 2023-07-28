@@ -41,39 +41,39 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        with(binding.bottomNavigationView) {
-            setBackgroundColor(GrayColor.toArgb())
-            itemIconTintList = null
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_create -> {
-                        navigationDispatcher.emit {
-                            it.navigate(
-                                resId = R.id.fragmentSkinEditor3D,
-                                navOptions = NavOptions.Builder()
-                                    .setPopUpTo(R.id.main_graph, true)
-                                    .build(),
-                                args = null
-                            )
-                        }
-                        true
-                    }
-                    R.id.nav_content -> {
-                        navigationDispatcher.emit {
-                            it.navigate(
-                                R.id.fragmentContent,
-                                navOptions = NavOptions.Builder()
-                                    .setPopUpTo(R.id.main_graph, true)
-                                    .build(),
-                                args = null
-                            )
-                        }
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }
+//        with(binding.bottomNavigationView) {
+//            setBackgroundColor(GrayColor.toArgb())
+//            itemIconTintList = null
+//            setOnItemSelectedListener { item ->
+//                when (item.itemId) {
+//                    R.id.nav_create -> {
+//                        navigationDispatcher.emit {
+//                            it.navigate(
+//                                resId = R.id.fragmentSkinEditor3D,
+//                                navOptions = NavOptions.Builder()
+//                                    .setPopUpTo(R.id.main_graph, true)
+//                                    .build(),
+//                                args = null
+//                            )
+//                        }
+//                        true
+//                    }
+//                    R.id.nav_content -> {
+//                        navigationDispatcher.emit {
+//                            it.navigate(
+//                                R.id.fragmentContent,
+//                                navOptions = NavOptions.Builder()
+//                                    .setPopUpTo(R.id.main_graph, true)
+//                                    .build(),
+//                                args = null
+//                            )
+//                        }
+//                        true
+//                    }
+//                    else -> false
+//                }
+//            }
+//        }
         setContentView(binding.root)
         applyEdgeToEdge()
         lifecycleScope.apply {
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentSkinEditor2D // replace with the correct one when ready
+    private fun provideStartDestination(): Int = R.id.fragmentBodyPartChooser // replace with the correct one when ready
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->

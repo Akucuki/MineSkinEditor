@@ -36,5 +36,20 @@
     <string name="skins">SKINS</string>
     <string name="addons">ADDONS</string>
     <string name="maps">MAPS</string>
+    <string name="part_of_skin">Part of skin</string>
+    <!-- Body parts -->
+    <string name="head">Head</string>
+    <string name="body">Body</string>
+    <string name="left_arm">Left Arm</string>
+    <string name="right_arm">Right Arm</string>
+    <string name="left_leg">Left Leg</string>
+    <string name="right_leg">Right Leg</string>
+    <!-- Body parts faces -->
+    <string name="top">TOP</string>
+    <string name="right">RIGHT</string>
+    <string name="front">FRONT</string>
+    <string name="left">LEFT</string>
+    <string name="back">BACK</string>
+    <string name="bottom">BOTTOM</string>
 
 </resources>
