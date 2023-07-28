@@ -1,6 +1,8 @@
 package com.example.mineskineditorlibgdx.features.skinEditor2D.editor.composables
 
 import android.graphics.Bitmap
+import android.util.Log
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -9,6 +11,8 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,11 +23,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintCanvas
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
+import com.example.mineskineditorlibgdx.model.EditorToolThickness
+import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
+import com.example.mineskineditorlibgdx.utils.asPaintCanvas
 import com.example.mineskineditorlibgdx.utils.calculateLineCoordinates
 import com.example.mineskineditorlibgdx.utils.twoFingerTransformable
 
@@ -42,7 +50,14 @@ fun SkinCanvas(
     minScale: Float = .5f,
     maxScale: Float = 3f,
     minOffsetDenominator: Float = 2f,
-    maxOffsetDenominator: Float = 2f
+    maxOffsetDenominator: Float = 2f,
+
+    paintTool: State<PaintTool>,
+    paintColor: State<ParcelableColorEntry>,
+    initialPaintCanvas: PaintCanvas,
+    @FloatRange(from = 0.0, to = 1.0)
+    paintToolStrength: State<Float>,
+    paintToolThicknessType: State<EditorToolThickness>,
 ) {
     var mutableBitmap by remember(bitmap) {
         mutableStateOf(
@@ -85,6 +100,10 @@ fun SkinCanvas(
 
     var lastPos: Offset? = remember { null }
 
+    LaunchedEffect(paintColor) {
+        Log.d("vitalik", "selectedColor: $paintColor")
+    }
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -104,7 +123,16 @@ fun SkinCanvas(
                     mutableBitmap = mutableBitmap
                         .copy(Bitmap.Config.ARGB_8888, true)
                         .apply {
-                            setPixel(pixelX, pixelY, Color.Red.toArgb())
+                            Log.d("vitalik", "paint color: $paintColor")
+                            paintTool.value.use(
+                                x = pixelX,
+                                y = pixelY,
+                                color = paintColor.value.toColorEntry().color,
+                                canvas = this.asPaintCanvas(),
+                                strength = paintToolStrength.value,
+                                thickness = paintToolThicknessType.value.thickness,
+                                initialCanvas = initialPaintCanvas
+                            )
                         }
                 }
             }
@@ -131,7 +159,16 @@ fun SkinCanvas(
                                         ) {
                                             return@forEach
                                         }
-                                        setPixel(x, y, Color.Red.toArgb())
+                                        Log.d("vitalik", "paint color: $paintColor")
+                                        paintTool.value.use(
+                                            x = x,
+                                            y = y,
+                                            color = paintColor.value.toColorEntry().color,
+                                            canvas = this.asPaintCanvas(),
+                                            strength = paintToolStrength.value,
+                                            thickness = paintToolThicknessType.value.thickness,
+                                            initialCanvas = initialPaintCanvas
+                                        )
                                     }
                                 }
                         }

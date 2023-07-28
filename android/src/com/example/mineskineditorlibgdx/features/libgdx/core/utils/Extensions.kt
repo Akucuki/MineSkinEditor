@@ -16,7 +16,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintCanvas
 import com.example.mineskineditorlibgdx.model.ModelTriangle
+import com.example.mineskineditorlibgdx.utils.toLibGDXColor
 
 const val BYTES_IN_FLOAT = 4
 
@@ -27,6 +29,46 @@ fun Color.toCompose(): androidx.compose.ui.graphics.Color {
 fun TextureData.safeConsumePixmap(): Pixmap {
     if (!isPrepared) prepare()
     return consumePixmap()
+}
+
+fun Pixmap.asPaintCanvas(): PaintCanvas {
+    val pixmap = this
+    return object : PaintCanvas {
+
+        override val width: Int
+            get() = pixmap.width
+        override val height: Int
+            get() = pixmap.height
+
+
+        override fun drawPixel(x: Int, y: Int, color: androidx.compose.ui.graphics.Color) {
+            pixmap.drawPixel(x, y, Color.rgba8888(color.toLibGDXColor()))
+        }
+
+        override fun fill(color: androidx.compose.ui.graphics.Color) {
+            pixmap.apply {
+                setColor(color.toLibGDXColor())
+                fill()
+            }
+        }
+
+        override fun fillRectangle(
+            x: Int,
+            y: Int,
+            width: Int,
+            height: Int,
+            color: androidx.compose.ui.graphics.Color
+        ) {
+            pixmap.apply {
+                setColor(color.toLibGDXColor())
+                fillRectangle(x, y, width, height)
+            }
+        }
+
+        override fun getPixel(x: Int, y: Int): androidx.compose.ui.graphics.Color {
+            return Color(pixmap.getPixel(x, y)).toCompose()
+        }
+    }
 }
 
 fun ShapeRenderer.safeDrawLine(
@@ -43,6 +85,7 @@ fun ShapeRenderer.safeDrawLine(
     line(startVector, endVector)
     end()
 }
+
 fun ShapeRenderer.safeDrawModelTriangles(
     cam: Camera,
     triangles: List<ModelTriangle>,
@@ -95,7 +138,8 @@ fun ModelInstance.setFirstMaterialTexture(texture: Texture) {
 }
 
 fun ModelInstance.firstMaterialTexture(): Texture {
-    val instanceTextureAttribute = materials.first().get(TextureAttribute.Diffuse) as TextureAttribute
+    val instanceTextureAttribute =
+        materials.first().get(TextureAttribute.Diffuse) as TextureAttribute
     return instanceTextureAttribute.textureDescription.texture
 }
 

@@ -1,18 +1,19 @@
 package com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
+import androidx.annotation.FloatRange
+
 
 object EraserTool : PaintTool {
 
     override fun use(
         x: Int,
         y: Int,
-        color: Color,
-        pixmap: Pixmap,
+        color: androidx.compose.ui.graphics.Color,
+        canvas: PaintCanvas,
         thickness: Int,
+        @FloatRange(from = 0.0, to = 1.0)
         strength: Float,
-        initialPixmap: Pixmap
+        initialCanvas: PaintCanvas
     ) {
         val halfThickness = thickness / 2
         val startX = x - halfThickness
@@ -21,8 +22,14 @@ object EraserTool : PaintTool {
         val endY = y + halfThickness
         for (i in startX..endX) {
             for (j in startY..endY) {
-                val initialPixmapColor = Color(initialPixmap.getPixel(i, j))
-                pixmap.drawPixel(i, j, Color.rgba8888(initialPixmapColor))
+                if (
+                    i !in 0 until initialCanvas.width ||
+                    j !in 0 until initialCanvas.height
+                ) {
+                    continue
+                }
+                val initialCanvasColor = initialCanvas.getPixel(i, j)
+                canvas.drawPixel(i, j, initialCanvasColor)
             }
         }
     }
