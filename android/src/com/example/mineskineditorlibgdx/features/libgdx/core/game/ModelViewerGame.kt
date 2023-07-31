@@ -189,13 +189,13 @@ class ModelViewerGame(
                     val pixmap = texture.textureData.safeConsumePixmap()
                     if (isPaintEnabled) {
                         paintTool.use(
-                            textureX,
-                            textureY,
-                            paintColor.toCompose(),
-                            pixmap.asPaintCanvas(),
-                            paintThickness,
-                            noisePaintStrength,
-                            initialModelTexture!!.textureData.safeConsumePixmap().asPaintCanvas()
+                            x = textureX,
+                            y = textureY,
+                            color = paintColor.toCompose(),
+                            canvas = pixmap.asPaintCanvas(),
+                            thickness = paintThickness,
+                            strength = noisePaintStrength,
+                            initialBaseCanvas = initialModelTexture!!.textureData.safeConsumePixmap().asPaintCanvas()
                         )
                         val newTexture = Texture(pixmap)
                         instance?.setFirstMaterialTexture(newTexture)

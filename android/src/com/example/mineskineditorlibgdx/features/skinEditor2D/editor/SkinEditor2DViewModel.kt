@@ -10,11 +10,15 @@ import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.F
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.NoiseTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PencilTool
+import com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.SELECTED_BODY_PART_FACE
+import com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.SELECTED_BODY_PART_TYPE
 import com.example.mineskineditorlibgdx.model.AdditionalOptionsType
+import com.example.mineskineditorlibgdx.model.BodyPartType
 import com.example.mineskineditorlibgdx.model.ColorEntry
 import com.example.mineskineditorlibgdx.model.EditorToolThickness
 import com.example.mineskineditorlibgdx.model.EditorToolType
 import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
+import com.example.mineskineditorlibgdx.utils.NavigationDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -44,8 +48,12 @@ private const val SELECTED_SIZE_TYPE = "selectedSizeType"
 
 @HiltViewModel
 class SkinEditor2DViewModel @Inject constructor(
-    private val handle: SavedStateHandle
+    private val handle: SavedStateHandle,
+    private val navDispatcher: NavigationDispatcher
 ) : ViewModel() {
+
+    val selectedBodyPartType = handle.getStateFlow(SELECTED_BODY_PART_TYPE, BodyPartType.RIGHT_ARM)
+    val selectedFaceType = handle.getStateFlow(SELECTED_BODY_PART_FACE, BodyPartType.FaceType.FRONT)
 
     val activeToolType = handle.getStateFlow(SELECTED_TOOL_TYPE, EditorToolType.PENCIL)
     val areToolOptionsVisible = handle.getStateFlow(ARE_TOOL_OPTIONS_VISIBLE, false)
@@ -137,10 +145,8 @@ class SkinEditor2DViewModel @Inject constructor(
     private fun onColorAdded(color: Color) {
         val newColorEntry = ColorEntry(color = color)
         val colors = recentColors.value
-//        val colors = recentColors
         colors.removeLast()
         colors.addFirst(newColorEntry.toParcelableColorEntry())
-//        recentColors.value = colors
         handle[RECENT_COLORS] = colors
         onColorClick(newColorEntry)
     }
@@ -148,6 +154,10 @@ class SkinEditor2DViewModel @Inject constructor(
     fun onColorPickerOkClick(color: ColorEntry) {
         onColorAdded(color.color)
         _isColorPickerDialogVisible.value = false
+    }
+
+    fun onBackClick() {
+        navDispatcher.emit { it.popBackStack() }
     }
 
 }

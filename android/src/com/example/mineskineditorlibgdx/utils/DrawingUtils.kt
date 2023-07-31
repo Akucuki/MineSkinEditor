@@ -21,12 +21,77 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.IntOffset
+import com.example.mineskineditorlibgdx.model.BodyPartType
+import com.example.mineskineditorlibgdx.model.FaceCoordinates
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlin.math.PI
 import kotlin.math.abs
+
+fun getBodyPartFaceCoordinates(
+    bodyPartType: BodyPartType,
+    faceType: BodyPartType.FaceType
+): FaceCoordinates {
+    val top = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(8, 0, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(20, 16, 8, 4)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(44, 16, 4, 4)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(36, 48, 4, 4)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(4, 16, 4, 4)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(20, 48, 4, 4)
+    }
+    val right = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(16, 8, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(28, 20, 4, 12)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(40, 20, 4, 12)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(40, 52, 4, 12)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(8, 20, 4, 12)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(24, 52, 4, 12)
+    }
+    val front = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(8, 8, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(20, 20, 8, 12)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(44, 20, 4, 12)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(36, 52, 4, 12)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(4, 20, 4, 12)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(20, 52, 4, 12)
+    }
+    val left = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(0, 8, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(16, 20, 4, 12)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(40, 20, 4, 12)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(32, 52, 4, 12)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(0, 20, 4, 12)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(16, 52, 4, 12)
+    }
+    val back = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(24, 8, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(32, 20, 8, 12)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(52, 20, 4, 12)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(44, 52, 4, 12)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(12, 20, 4, 12)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(28, 52, 4, 12)
+    }
+    val bottom = when (bodyPartType) {
+        BodyPartType.HEAD -> FaceCoordinates(16, 0, 8, 8)
+        BodyPartType.BODY -> FaceCoordinates(28, 16, 8, 4)
+        BodyPartType.RIGHT_ARM -> FaceCoordinates(48, 16, 4, 4)
+        BodyPartType.LEFT_ARM -> FaceCoordinates(40, 48, 4, 4)
+        BodyPartType.RIGHT_LEG -> FaceCoordinates(8, 16, 4, 4)
+        BodyPartType.LEFT_LEG -> FaceCoordinates(24, 48, 4, 4)
+    }
+    val faceCoordinates = when (faceType) {
+        BodyPartType.FaceType.TOP -> top
+        BodyPartType.FaceType.RIGHT -> right
+        BodyPartType.FaceType.FRONT -> front
+        BodyPartType.FaceType.LEFT -> left
+        BodyPartType.FaceType.BACK -> back
+        BodyPartType.FaceType.BOTTOM -> bottom
+    }
+    return faceCoordinates
+}
 
 fun Modifier.twoFingerTransformable(
     state: TransformableState,

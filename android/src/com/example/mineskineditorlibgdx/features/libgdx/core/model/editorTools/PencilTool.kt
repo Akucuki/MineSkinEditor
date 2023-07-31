@@ -7,9 +7,9 @@ object PencilTool : PaintTool {
         y: Int,
         color: androidx.compose.ui.graphics.Color,
         canvas: PaintCanvas,
+        initialBaseCanvas: BaseCanvas,
         thickness: Int,
         strength: Float,
-        initialCanvas: PaintCanvas
     ) {
         canvas.drawPixel(x, y, color)
     }

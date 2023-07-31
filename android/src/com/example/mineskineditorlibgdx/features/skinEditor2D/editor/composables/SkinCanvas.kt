@@ -11,7 +11,7 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +27,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintCanvas
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.BaseCanvas
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintTool
 import com.example.mineskineditorlibgdx.model.EditorToolThickness
 import com.example.mineskineditorlibgdx.model.ParcelableColorEntry
@@ -39,7 +39,8 @@ import com.example.mineskineditorlibgdx.utils.twoFingerTransformable
 @Composable
 fun SkinCanvas(
     modifier: Modifier = Modifier,
-    bitmap: Bitmap,
+    bitmap: MutableState<Bitmap?>,
+    initialBaseCanvas: BaseCanvas?,
     gridStrokeThickness: Dp = 2.dp,
     gridStrokeColor: Color,
     areBackgroundCellsEnabled: Boolean = true,
@@ -47,31 +48,27 @@ fun SkinCanvas(
     backgroundCellsPrimaryColor: Color = Color.LightGray,
     backgroundCellsSecondaryColor: Color = Color.Gray,
 
-    minScale: Float = .5f,
+    minScale: Float = .3f,
     maxScale: Float = 3f,
     minOffsetDenominator: Float = 2f,
     maxOffsetDenominator: Float = 2f,
 
     paintTool: State<PaintTool>,
     paintColor: State<ParcelableColorEntry>,
-    initialPaintCanvas: PaintCanvas,
     @FloatRange(from = 0.0, to = 1.0)
     paintToolStrength: State<Float>,
     paintToolThicknessType: State<EditorToolThickness>,
 ) {
-    var mutableBitmap by remember(bitmap) {
-        mutableStateOf(
-            bitmap.copy(
-                Bitmap.Config.ARGB_8888,
-                true
-            )
-        )
+    if (bitmap.value == null || initialBaseCanvas == null) return
+
+    require(bitmap.value!!.isMutable) {
+        IllegalArgumentException("Bitmap for SkinCanvas must be mutable")
     }
 
-    val aspectRatio = remember(bitmap) { bitmap.width.toFloat() / bitmap.height }
+    val aspectRatio = remember(bitmap) { bitmap.value!!.width.toFloat() / bitmap.value!!.height }
 
     var canvasSize by remember { mutableStateOf(Size.Zero) }
-    val gridStrokesCount = remember { mutableBitmap.width + 1 }
+    val gridStrokesCount = remember(bitmap) { bitmap.value!!.width + 1 }
     var cellSize by remember { mutableStateOf(0f) }
 
     var scale by remember { mutableStateOf(1f) }
@@ -100,10 +97,6 @@ fun SkinCanvas(
 
     var lastPos: Offset? = remember { null }
 
-    LaunchedEffect(paintColor) {
-        Log.d("vitalik", "selectedColor: $paintColor")
-    }
-
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -120,7 +113,7 @@ fun SkinCanvas(
                     val y = it.y
                     val pixelX = (x / cellSize).toInt()
                     val pixelY = (y / cellSize).toInt()
-                    mutableBitmap = mutableBitmap
+                    bitmap.value = bitmap.value!!
                         .copy(Bitmap.Config.ARGB_8888, true)
                         .apply {
                             Log.d("vitalik", "paint color: $paintColor")
@@ -131,7 +124,7 @@ fun SkinCanvas(
                                 canvas = this.asPaintCanvas(),
                                 strength = paintToolStrength.value,
                                 thickness = paintToolThicknessType.value.thickness,
-                                initialCanvas = initialPaintCanvas
+                                initialBaseCanvas = initialBaseCanvas
                             )
                         }
                 }
@@ -149,13 +142,13 @@ fun SkinCanvas(
                             val lastY = (lastOffset.y / cellSize).toInt()
                             val linePixels =
                                 calculateLineCoordinates(lastX, lastY, currentX, currentY)
-                            mutableBitmap = mutableBitmap
+                            bitmap.value = bitmap.value!!
                                 .copy(Bitmap.Config.ARGB_8888, true)
                                 .apply {
                                     linePixels.forEach { (x, y) ->
                                         if (
-                                            x !in 0 until mutableBitmap.width ||
-                                            y !in 0 until mutableBitmap.height
+                                            x !in 0 until bitmap.value!!.width ||
+                                            y !in 0 until bitmap.value!!.height
                                         ) {
                                             return@forEach
                                         }
@@ -167,7 +160,7 @@ fun SkinCanvas(
                                             canvas = this.asPaintCanvas(),
                                             strength = paintToolStrength.value,
                                             thickness = paintToolThicknessType.value.thickness,
-                                            initialCanvas = initialPaintCanvas
+                                            initialBaseCanvas = initialBaseCanvas
                                         )
                                     }
                                 }
@@ -181,12 +174,12 @@ fun SkinCanvas(
             .twoFingerTransformable(transformableState)
     ) {
         canvasSize = size
-        cellSize = (canvasSize.width - gridStrokeThicknessPx) / mutableBitmap.width
+        cellSize = (canvasSize.width - gridStrokeThicknessPx) / bitmap.value!!.width
 
         val wrappedCellSize =
-            (size.width - gridStrokesCount * gridStrokeThicknessPx) / mutableBitmap.width
+            (size.width - gridStrokesCount * gridStrokeThicknessPx) / bitmap.value!!.width
         drawBitmapPixels(
-            bitmap = mutableBitmap,
+            bitmap = bitmap.value!!,
             cellSize = wrappedCellSize,
             spacing = gridStrokeThicknessPx,
             areBackgroundCellsEnabled = areBackgroundCellsEnabled,

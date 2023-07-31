@@ -10,10 +10,10 @@ object EraserTool : PaintTool {
         y: Int,
         color: androidx.compose.ui.graphics.Color,
         canvas: PaintCanvas,
+        initialBaseCanvas: BaseCanvas,
         thickness: Int,
         @FloatRange(from = 0.0, to = 1.0)
         strength: Float,
-        initialCanvas: PaintCanvas
     ) {
         val halfThickness = thickness / 2
         val startX = x - halfThickness
@@ -23,12 +23,12 @@ object EraserTool : PaintTool {
         for (i in startX..endX) {
             for (j in startY..endY) {
                 if (
-                    i !in 0 until initialCanvas.width ||
-                    j !in 0 until initialCanvas.height
+                    i !in 0 until initialBaseCanvas.width ||
+                    j !in 0 until initialBaseCanvas.height
                 ) {
                     continue
                 }
-                val initialCanvasColor = initialCanvas.getPixel(i, j)
+                val initialCanvasColor = initialBaseCanvas.getPixel(i, j)
                 canvas.drawPixel(i, j, initialCanvasColor)
             }
         }

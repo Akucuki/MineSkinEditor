@@ -19,13 +19,16 @@
         android:name="com.example.mineskineditorlibgdx.features.content.ContentFragment"/>
 
     <fragment
-        android:id="@+id/fragmentSkinEditor2D"
-        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.editor.SkinEditor2DFragment">
+        android:id="@+id/fragmentBodyPartChooser"
+        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.BodyPartChooserFragment">
+        <action
+            android:id="@+id/goFragmentSkinEditor2D"
+            app:destination="@id/fragmentSkinEditor2D"/>
     </fragment>
 
     <fragment
-        android:id="@+id/fragmentBodyPartChooser"
-        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.BodyPartChooserFragment">
+        android:id="@+id/fragmentSkinEditor2D"
+        android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.editor.SkinEditor2DFragment">
     </fragment>
 
 </navigation>

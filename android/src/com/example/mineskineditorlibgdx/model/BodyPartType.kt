@@ -21,18 +21,18 @@ enum class BodyPartType(val partNameStringId: Int) {
     }
 }
 
-//data class BodyPartFace(
-//    val type: BodyPartType.FaceType,
-//    val bitmap: Bitmap
-//)
+data class BodyPartFace(
+    val type: BodyPartType.FaceType,
+    val bitmap: Bitmap
+)
 
 data class BodyPart(
     val type: BodyPartType,
-//    val faces: List<BodyPartFace>
-    val top: Bitmap,
-    val right: Bitmap,
-    val front: Bitmap,
-    val left: Bitmap,
-    val back: Bitmap,
-    val bottom: Bitmap
+    val faces: List<BodyPartFace>
+//    val top: Bitmap,
+//    val right: Bitmap,
+//    val front: Bitmap,
+//    val left: Bitmap,
+//    val back: Bitmap,
+//    val bottom: Bitmap
 )

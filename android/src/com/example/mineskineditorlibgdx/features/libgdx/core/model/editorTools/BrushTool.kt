@@ -9,10 +9,10 @@ object BrushTool : PaintTool {
         y: Int,
         color: androidx.compose.ui.graphics.Color,
         canvas: PaintCanvas,
+        initialBaseCanvas: BaseCanvas,
         thickness: Int,
         @FloatRange(from = 0.0, to = 1.0)
         strength: Float,
-        initialCanvas: PaintCanvas
     ) {
         val centerX = x - thickness / 2 - 1
         val centerY = y - thickness / 2 - 1

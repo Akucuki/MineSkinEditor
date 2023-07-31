@@ -1,16 +1,33 @@
 package com.example.mineskineditorlibgdx.utils
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.BaseCanvas
 import com.example.mineskineditorlibgdx.features.libgdx.core.model.editorTools.PaintCanvas
 import com.example.mineskineditorlibgdx.model.BodyPart
 import com.example.mineskineditorlibgdx.model.BodyPartFace
 import com.example.mineskineditorlibgdx.model.BodyPartType
+import com.example.mineskineditorlibgdx.model.FaceCoordinates
 
 fun Color.toLibGDXColor(): com.badlogic.gdx.graphics.Color {
     return com.badlogic.gdx.graphics.Color(red, green, blue, alpha)
+}
+
+fun Bitmap.asBaseCanvas(): BaseCanvas {
+    val bitmap = this
+    return object : BaseCanvas {
+        override val width: Int
+            get() = bitmap.width
+        override val height: Int
+            get() = bitmap.height
+
+        override fun getPixel(x: Int, y: Int): Color {
+            return Color(bitmap.getPixel(x, y))
+        }
+    }
 }
 
 fun Bitmap.asPaintCanvas(): PaintCanvas {
@@ -58,49 +75,54 @@ fun Bitmap.asPaintCanvas(): PaintCanvas {
     }
 }
 
-data class FaceCoordinates(val x: Int, val y: Int, val width: Int, val height: Int)
+private fun Bitmap.copyPartFace(faceCoordinates: FaceCoordinates): Bitmap {
+    Log.d("vitalik", "faceCoordinates: $faceCoordinates")
+    Log.d("vitalik", "this.size: ${this.width}x${this.height}")
+    return Bitmap.createBitmap(
+        this,
+        faceCoordinates.x,
+        faceCoordinates.y,
+        faceCoordinates.width,
+        faceCoordinates.height,
+    )
+}
+
+fun Bitmap.getBodyPartFace(bodyPartType: BodyPartType, faceType: BodyPartType.FaceType): Bitmap {
+    return this.copyPartFace(getBodyPartFaceCoordinates(bodyPartType, faceType))
+}
+
+fun Bitmap.composeBitmapWithFace(
+    bodyPartType: BodyPartType,
+    faceType: BodyPartType.FaceType,
+    updatedFace: Bitmap
+): Bitmap {
+    val newBitmap = Bitmap.createBitmap(this.width, this.height, this.config)
+    val canvas = Canvas(newBitmap)
+
+    // Draw the original skin onto the new Bitmap.
+    // This is necessary because the new Bitmap is initially empty.
+    canvas.drawBitmap(this, 0f, 0f, null)
+
+    // Get the coordinates of the face.
+    val faceCoordinates = getBodyPartFaceCoordinates(bodyPartType, faceType)
+
+    // Draw the updated face onto the new Bitmap.
+    canvas.drawBitmap(updatedFace, faceCoordinates.x.toFloat(), faceCoordinates.y.toFloat(), null)
+
+    return newBitmap
+}
+
+fun Bitmap.getBodyPartFaces(bodyPartType: BodyPartType): List<BodyPartFace> {
+    Log.d("vitalik", "body part bitmap: ${this.width}x${this.height}")
+    return BodyPartType.FaceType.values().map { faceType ->
+        BodyPartFace(faceType, this.getBodyPartFace(bodyPartType, faceType))
+    }
+}
 
 fun Bitmap.getBodyPart(bodyPartType: BodyPartType): BodyPart {
-    val top = when (bodyPartType) {
-        BodyPartType.HEAD -> FaceCoordinates(8, 0, 8, 8)
-        BodyPartType.BODY -> FaceCoordinates(20, 16, 8, 4)
-        BodyPartType.RIGHT_ARM -> FaceCoordinates(44, 16, 4, 4)
-        BodyPartType.LEFT_ARM -> FaceCoordinates(36, 48, 4, 4)
-        BodyPartType.RIGHT_LEG -> FaceCoordinates( 4, 16, 4, 4)
-        BodyPartType.LEFT_LEG -> FaceCoordinates(20, 48, 4, 4)
-    }
-    val right = when (bodyPartType) {
-        BodyPartType.HEAD -> FaceCoordinates(0, 8, 8, 8)
-        BodyPartType.BODY -> FaceCoordinates(16, 20, 4, 12)
-        BodyPartType.RIGHT_ARM -> FaceCoordinates(40, 20, 4, 12)
-        BodyPartType.LEFT_ARM -> FaceCoordinates(40, 52, 4, 12)
-        BodyPartType.RIGHT_LEG -> FaceCoordinates( 0, 20, 4, 12)
-        BodyPartType.LEFT_LEG -> FaceCoordinates(24, 52, 4, 12)
-    }
-    val front = when (bodyPartType) {
-        BodyPartType.HEAD -> FaceCoordinates(8, 8, 8, 8)
-        BodyPartType.BODY -> FaceCoordinates(20, 20, 8, 12)
-        BodyPartType.RIGHT_ARM -> FaceCoordinates(44, 20, 4, 12)
-        BodyPartType.LEFT_ARM -> FaceCoordinates(36, 52, 4, 12)
-        BodyPartType.RIGHT_LEG -> FaceCoordinates( 4, 20, 4, 12)
-        BodyPartType.LEFT_LEG -> FaceCoordinates(20, 52, 4, 12)
-    }
-    val left = when (bodyPartType) {
-        BodyPartType.HEAD -> FaceCoordinates(8, 8, 8, 8)
-        BodyPartType.BODY -> FaceCoordinates(20, 20, 8, 12)
-        BodyPartType.RIGHT_ARM -> FaceCoordinates(44, 20, 4, 12)
-        BodyPartType.LEFT_ARM -> FaceCoordinates(36, 52, 4, 12)
-        BodyPartType.RIGHT_LEG -> FaceCoordinates( 4, 20, 4, 12)
-        BodyPartType.LEFT_LEG -> FaceCoordinates(20, 52, 4, 12)
-    }
     return BodyPart(
-        type = bodyPartType,
-        top = Bitmap.createBitmap(this, 8, 0, 8, 8),
-        right = Bitmap.createBitmap(this, 0, 8, 8, 12),
-        front = Bitmap.createBitmap(this, 8, 8, 8, 12),
-        left = Bitmap.createBitmap(this, 16, 8, 8, 12),
-        back = Bitmap.createBitmap(this, 24, 8, 8, 12),
-        bottom = Bitmap.createBitmap(this, 16, 0, 8, 8)
+        bodyPartType,
+        this.getBodyPartFaces(bodyPartType)
     )
 }
 
