@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         }
     }
 
-    private fun provideStartDestination(): Int = R.id.fragmentSkinEditor2D // replace with the correct one when ready
+    private fun provideStartDestination(): Int = R.id.fragmentCategoryOptionsEditor // replace with the correct one when ready
 
     private fun initNavigation(startDestination: Int) {
         (supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment).also { navHost ->

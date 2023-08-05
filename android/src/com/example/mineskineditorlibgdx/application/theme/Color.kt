@@ -16,3 +16,5 @@ val OkButtonBackgroundGradientStartColor = Color(0xFFFED441)
 val OkButtonBackgroundGradientEndColor = Color(0xFFF4933D)
 val OrangeColor = Color(0xFFFF8A00)
 val LightOrangeColor = Color(0xFFF9B96E)
+val LightGrayColor = Color(0xFF9A9A9A)
+

@@ -17,9 +17,13 @@ val Poppins = FontFamily(
 val Typography = Typography(
     defaultFontFamily = Poppins,
     body1 = TextStyle(
-        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
+    ),
+    body2 = TextStyle(
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+        lineHeight = 20.sp
     ),
     button = TextStyle(
         fontFamily = Poppins,
