@@ -28,4 +28,14 @@
         android:name="com.example.mineskineditorlibgdx.features.skinEditor2D.bodyPartChooser.BodyPartChooserFragment">
     </fragment>
 
+    <fragment
+        android:id="@+id/fragmentCategoryChooser"
+        android:name="com.example.mineskineditorlibgdx.features.addonsEditor.categoryChooser.CategoryChooserFragment">
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragmentCategoryOptionsEditor"
+        android:name="com.example.mineskineditorlibgdx.features.addonsEditor.categoryOptionsEditor.CategoryOptionsEditor">
+    </fragment>
+
 </navigation>
