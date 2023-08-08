@@ -36,5 +36,9 @@
     <string name="skins">SKINS</string>
     <string name="addons">ADDONS</string>
     <string name="maps">MAPS</string>
+    <string name="save_changes_before_exiting">Save changes before exiting?</string>
+    <string name="exit_without_change">Exit without change</string>
+    <string name="select_all">Select all</string>
+    <string name="done">Done</string>
 
 </resources>

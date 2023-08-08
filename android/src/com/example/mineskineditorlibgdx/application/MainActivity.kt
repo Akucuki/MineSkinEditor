@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -30,6 +31,13 @@ class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
         destination.toString()
         arguments.toString()
         // TODO place some stuff here
+
+        val bottomNavigationView = binding.bottomNavigationView
+        val isBottomNavigationViewVisible = when (destination.id) {
+            R.id.fragmentCategoryOptionsEditor -> false
+            else -> true
+        }
+        bottomNavigationView.isVisible = isBottomNavigationViewVisible
     }
 
     @Inject
